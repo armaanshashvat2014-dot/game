@@ -3,12 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport"
-      content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+      content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 
-<title>Escape The School - Multiplayer</title>
+<title>Escape The School | Multiplayer</title>
 
 <style>
-
 *{
     box-sizing:border-box;
     margin:0;
@@ -19,211 +18,304 @@ html,body{
     width:100%;
     height:100%;
     overflow:hidden;
-    background:#050505;
+    background:#05070a;
     font-family:Arial,Helvetica,sans-serif;
 }
 
 canvas{
     display:block;
-    width:100%;
-    height:100%;
 }
 
-#hud{
-    position:fixed;
-    top:15px;
-    left:15px;
-    z-index:10;
-    color:white;
-    pointer-events:none;
-    user-select:none;
+button,input{
+    font:inherit;
 }
 
-.panel{
-    background:rgba(0,0,0,.65);
-    border:1px solid rgba(255,255,255,.18);
-    border-radius:12px;
-    padding:12px 15px;
-    margin-bottom:8px;
-    backdrop-filter:blur(8px);
+button{
+    cursor:pointer;
 }
 
-#healthBar{
-    width:180px;
-    height:15px;
-    background:#333;
-    border-radius:20px;
-    overflow:hidden;
-    margin-top:6px;
+.hidden{
+    display:none!important;
 }
 
-#healthFill{
-    width:100%;
-    height:100%;
-    background:#32d46b;
-    transition:.2s;
-}
-
-#timer{
-    font-size:22px;
-    font-weight:bold;
-}
-
-#keys{
-    font-size:18px;
-    margin-top:5px;
-}
-
-#players{
-    font-size:14px;
-    line-height:1.5;
-}
-
-#message{
-    position:fixed;
-    left:50%;
-    bottom:80px;
-    transform:translateX(-50%);
-    z-index:20;
-    color:white;
-    background:rgba(0,0,0,.8);
-    border:1px solid rgba(255,255,255,.2);
-    border-radius:12px;
-    padding:12px 20px;
-    font-size:16px;
-    opacity:0;
-    transition:.2s;
-    pointer-events:none;
-}
-
-#crosshair{
-    position:fixed;
-    left:50%;
-    top:50%;
-    width:8px;
-    height:8px;
-    margin-left:-4px;
-    margin-top:-4px;
-    border:2px solid white;
-    border-radius:50%;
-    z-index:5;
-    pointer-events:none;
-}
+/* MENU */
 
 #menu{
     position:fixed;
     inset:0;
-    z-index:100;
+    z-index:1000;
     display:flex;
     align-items:center;
     justify-content:center;
+    padding:20px;
     background:
-        radial-gradient(circle at center,#172033,#030303 70%);
+        radial-gradient(circle at center,#1b2940 0%,#07090d 55%,#020304 100%);
     color:white;
 }
 
 .menuBox{
-    width:min(500px,92vw);
+    width:min(520px,95vw);
+    max-height:92vh;
+    overflow:auto;
     padding:30px;
-    background:rgba(10,10,15,.95);
-    border:1px solid #333;
-    border-radius:20px;
-    box-shadow:0 20px 80px rgba(0,0,0,.7);
+    border-radius:22px;
+    background:rgba(9,11,16,.96);
+    border:1px solid #343b48;
+    box-shadow:0 25px 100px rgba(0,0,0,.7);
 }
 
-h1{
-    font-size:38px;
-    margin-bottom:8px;
+.logo{
+    font-size:40px;
+    font-weight:900;
+    letter-spacing:-2px;
 }
 
 .subtitle{
-    color:#aaa;
+    color:#9ba5b5;
+    margin-top:6px;
     margin-bottom:25px;
+}
+
+.menuTitle{
+    margin:20px 0 10px;
+    font-size:15px;
+    color:#aab4c4;
 }
 
 input{
     width:100%;
     padding:14px;
-    margin:6px 0;
-    border-radius:10px;
-    border:1px solid #444;
-    background:#171717;
-    color:white;
+    margin:5px 0;
+    border:1px solid #3a414e;
+    border-radius:11px;
     outline:none;
-    font-size:16px;
+    background:#151922;
+    color:white;
+}
+
+input:focus{
+    border-color:#4388ff;
 }
 
 button{
     width:100%;
     padding:14px;
-    margin-top:10px;
+    margin-top:9px;
     border:0;
-    border-radius:10px;
-    background:#2563eb;
+    border-radius:11px;
+    background:#2463e9;
     color:white;
-    font-size:16px;
     font-weight:bold;
-    cursor:pointer;
 }
 
 button:hover{
-    background:#3474ff;
+    filter:brightness(1.12);
 }
 
 button.secondary{
-    background:#292929;
+    background:#292e38;
 }
 
-button.danger{
-    background:#a83232;
+button.green{
+    background:#159447;
 }
 
-.hidden{
-    display:none !important;
+button.red{
+    background:#a73535;
 }
 
-#roomInfo{
+.roomCard{
     margin-top:15px;
-    padding:15px;
-    border-radius:12px;
-    background:#151515;
-    text-align:center;
+    padding:16px;
+    background:#131720;
+    border:1px solid #303744;
+    border-radius:14px;
 }
 
 #roomCode{
-    font-size:30px;
-    letter-spacing:5px;
-    font-weight:bold;
-    margin-top:8px;
+    margin:8px 0;
+    font-size:34px;
+    font-weight:900;
+    text-align:center;
+    letter-spacing:7px;
 }
+
+#roomPlayers{
+    color:#b9c1cf;
+    line-height:1.7;
+}
+
+/* HUD */
+
+#hud{
+    position:fixed;
+    top:14px;
+    left:14px;
+    z-index:20;
+    color:white;
+    pointer-events:none;
+    user-select:none;
+}
+
+.hudBox{
+    min-width:190px;
+    padding:10px 13px;
+    margin-bottom:7px;
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:12px;
+    background:rgba(0,0,0,.62);
+    backdrop-filter:blur(8px);
+}
+
+#healthBar{
+    width:180px;
+    height:13px;
+    margin-top:6px;
+    overflow:hidden;
+    border-radius:20px;
+    background:#292d32;
+}
+
+#healthFill{
+    width:100%;
+    height:100%;
+    background:#2fd16a;
+    transition:width .15s;
+}
+
+#timer{
+    font-size:22px;
+    font-weight:900;
+}
+
+#objective{
+    color:#ffd84a;
+}
+
+#playersHud{
+    font-size:13px;
+    line-height:1.5;
+}
+
+#saveStatus{
+    color:#78e69b;
+    font-size:12px;
+}
+
+/* PAUSE */
+
+#pauseButton{
+    position:fixed;
+    right:15px;
+    top:15px;
+    z-index:30;
+    width:auto;
+    padding:10px 15px;
+    display:none;
+}
+
+#pauseOverlay{
+    position:fixed;
+    inset:0;
+    z-index:200;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,.72);
+    color:white;
+}
+
+.pauseBox{
+    width:min(400px,90vw);
+    padding:30px;
+    border-radius:18px;
+    text-align:center;
+    background:#11151d;
+    border:1px solid #353c49;
+}
+
+.pauseBox h2{
+    font-size:34px;
+    margin-bottom:10px;
+}
+
+/* MESSAGE */
+
+#message{
+    position:fixed;
+    left:50%;
+    bottom:75px;
+    transform:translateX(-50%);
+    z-index:50;
+    padding:12px 20px;
+    border-radius:12px;
+    color:white;
+    background:rgba(0,0,0,.82);
+    border:1px solid rgba(255,255,255,.15);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .2s;
+    text-align:center;
+}
+
+/* CROSSHAIR */
+
+#crosshair{
+    position:fixed;
+    left:50%;
+    top:50%;
+    width:9px;
+    height:9px;
+    transform:translate(-50%,-50%);
+    border:2px solid white;
+    border-radius:50%;
+    z-index:10;
+    pointer-events:none;
+}
+
+/* GAME OVER */
 
 #gameOver{
     position:fixed;
     inset:0;
-    z-index:90;
-    background:rgba(0,0,0,.88);
+    z-index:500;
     display:flex;
     align-items:center;
     justify-content:center;
+    padding:20px;
+    background:rgba(0,0,0,.9);
     color:white;
     text-align:center;
 }
 
 .gameOverBox{
-    width:min(500px,90vw);
+    width:min(500px,92vw);
     padding:35px;
-    background:#111;
-    border:1px solid #333;
     border-radius:20px;
+    background:#11151b;
+    border:1px solid #343b47;
 }
+
+.gameOverBox h1{
+    font-size:42px;
+    margin-bottom:10px;
+}
+
+.gameOverBox p{
+    color:#b8c0cc;
+    line-height:1.6;
+}
+
+/* MOBILE */
 
 #mobileControls{
     position:fixed;
-    left:20px;
-    bottom:20px;
-    z-index:30;
+    left:15px;
+    bottom:15px;
+    z-index:40;
     display:none;
     user-select:none;
+    touch-action:none;
 }
 
 .mobileRow{
@@ -232,38 +324,35 @@ button.danger{
 }
 
 .mobileButton{
-    width:65px;
-    height:65px;
+    width:62px;
+    height:62px;
     margin:4px;
     border-radius:15px;
-    background:rgba(0,0,0,.55);
-    border:1px solid rgba(255,255,255,.3);
-    color:white;
     display:flex;
     align-items:center;
     justify-content:center;
-    font-size:25px;
+    color:white;
+    background:rgba(0,0,0,.58);
+    border:1px solid rgba(255,255,255,.25);
+    font-size:24px;
+    touch-action:none;
 }
 
-#pauseButton{
+#mobileInteract{
     position:fixed;
-    right:15px;
-    top:15px;
+    right:20px;
+    bottom:35px;
     z-index:40;
-    width:auto;
-    padding:10px 15px;
+    width:75px;
+    height:75px;
+    border-radius:50%;
     display:none;
-}
-
-#saveStatus{
-    color:#77ff99;
-    font-size:12px;
-    margin-top:5px;
+    background:rgba(36,99,233,.7);
 }
 
 @media(max-width:700px){
-
-    #mobileControls{
+    #mobileControls,
+    #mobileInteract{
         display:block;
     }
 
@@ -272,68 +361,88 @@ button.danger{
     }
 
     #hud{
-        transform:scale(.85);
+        transform:scale(.82);
         transform-origin:top left;
     }
 
-    h1{
+    .logo{
         font-size:30px;
     }
-}
 
+    .menuBox{
+        padding:23px;
+    }
+}
 </style>
 </head>
 
 <body>
 
+<!-- =====================================================
+     MENU
+===================================================== -->
+
 <div id="menu">
 
     <div class="menuBox">
 
-        <h1>🏫 ESCAPE THE SCHOOL</h1>
-
-        <div class="subtitle">
-            Multiplayer survival escape
+        <div class="logo">
+            🏫 ESCAPE THE SCHOOL
         </div>
 
-        <div id="nameSection">
+        <div class="subtitle">
+            Multiplayer survival race • 2–5 players
+        </div>
+
+        <div id="nameScreen">
+
+            <div class="menuTitle">
+                PLAYER NAME
+            </div>
 
             <input
                 id="playerName"
                 maxlength="20"
-                placeholder="Your player name"
+                placeholder="Enter your name"
             >
 
-            <button onclick="showRoomMenu()">
+            <button id="continueButton">
                 Continue
             </button>
 
         </div>
 
-        <div id="roomSection" class="hidden">
+        <div id="roomScreen" class="hidden">
 
-            <button onclick="createRoom()">
-                🎮 Create Multiplayer Room
+            <button id="createButton">
+                🎮 Create Room
             </button>
 
             <input
-                id="joinCode"
+                id="joinCodeInput"
                 maxlength="6"
-                placeholder="Enter room code"
+                placeholder="ROOM CODE"
+                autocomplete="off"
                 style="text-transform:uppercase"
             >
 
-            <button onclick="joinRoom()">
+            <button id="joinButton">
                 🔗 Join Room
             </button>
 
-            <button class="secondary" onclick="showNameMenu()">
-                Back
+            <button
+                id="backButton"
+                class="secondary">
+                ← Back
             </button>
 
-            <div id="roomInfo" class="hidden">
+            <div
+                id="roomCard"
+                class="roomCard hidden">
 
-                <div>Room Code</div>
+                <div style="text-align:center">
+                    ROOM CODE
+                </div>
 
                 <div id="roomCode">
                     ------
@@ -343,7 +452,9 @@ button.danger{
                     Waiting for players...
                 </div>
 
-                <button onclick="startRoom()">
+                <button
+                    id="startButton"
+                    class="green">
                     🚪 Start Game
                 </button>
 
@@ -355,11 +466,16 @@ button.danger{
 
 </div>
 
+
+<!-- =====================================================
+     HUD
+===================================================== -->
+
 <div id="hud">
 
-    <div class="panel">
+    <div class="hudBox">
 
-        <div>❤️ Health</div>
+        ❤️ Health
 
         <div id="healthBar">
             <div id="healthFill"></div>
@@ -367,89 +483,68 @@ button.danger{
 
     </div>
 
-    <div class="panel">
+    <div class="hudBox">
 
-        ⏱️ <span id="timer">04:00</span>
-
-    </div>
-
-    <div class="panel">
-
-        🔑 Keys:
-        <span id="keys">0 / 3</span>
+        ⏱️
+        <span id="timer">
+            04:00
+        </span>
 
     </div>
 
-    <div class="panel">
+    <div class="hudBox">
+
+        🎯
+        <span id="objective">
+            Find 3 keycards
+        </span>
+
+    </div>
+
+    <div class="hudBox">
 
         👥 Players
 
-        <div id="players">
-            1 player
+        <div id="playersHud">
+            Waiting...
         </div>
 
     </div>
 
     <div id="saveStatus">
-        ☁️ Saved
+        💾 Not saved
     </div>
 
 </div>
 
-<div id="crosshair"></div>
 
-<div id="message"></div>
-
-<button id="pauseButton" onclick="togglePause()">
+<button id="pauseButton">
     ⏸️ Pause
 </button>
 
-<div id="mobileControls">
 
-    <div class="mobileRow">
+<!-- =====================================================
+     PAUSE
+===================================================== -->
 
-        <div
-            class="mobileButton"
-            data-key="KeyW"
-        >▲</div>
+<div id="pauseOverlay" class="hidden">
 
-    </div>
+    <div class="pauseBox">
 
-    <div class="mobileRow">
+        <h2>⏸️ PAUSED</h2>
 
-        <div
-            class="mobileButton"
-            data-key="KeyA"
-        >◀</div>
-
-        <div
-            class="mobileButton"
-            data-key="KeyS"
-        >▼</div>
-
-        <div
-            class="mobileButton"
-            data-key="KeyD"
-        >▶</div>
-
-    </div>
-
-</div>
-
-<div id="gameOver" class="hidden">
-
-    <div class="gameOverBox">
-
-        <h1 id="gameOverTitle">
-            YOU ESCAPED!
-        </h1>
-
-        <p id="gameOverText">
-            Congratulations!
+        <p>
+            Your progress has been saved.
         </p>
 
-        <button onclick="location.reload()">
-            🔄 Back To Menu
+        <button id="resumeButton">
+            ▶️ Resume
+        </button>
+
+        <button
+            id="saveExitButton"
+            class="secondary">
+            💾 Save & Exit
         </button>
 
     </div>
@@ -457,12 +552,91 @@ button.danger{
 </div>
 
 
-<!-- THREE.JS -->
+<!-- =====================================================
+     MESSAGE
+===================================================== -->
+
+<div id="message"></div>
+
+<div id="crosshair"></div>
+
+
+<!-- =====================================================
+     MOBILE
+===================================================== -->
+
+<div id="mobileControls">
+
+    <div class="mobileRow">
+
+        <div class="mobileButton"
+             data-key="KeyW">
+            ▲
+        </div>
+
+    </div>
+
+    <div class="mobileRow">
+
+        <div class="mobileButton"
+             data-key="KeyA">
+            ◀
+        </div>
+
+        <div class="mobileButton"
+             data-key="KeyS">
+            ▼
+        </div>
+
+        <div class="mobileButton"
+             data-key="KeyD">
+            ▶
+        </div>
+
+    </div>
+
+</div>
+
+<button id="mobileInteract">
+    E
+</button>
+
+
+<!-- =====================================================
+     GAME OVER
+===================================================== -->
+
+<div id="gameOver" class="hidden">
+
+    <div class="gameOverBox">
+
+        <h1 id="gameOverTitle">
+            🏆 YOU ESCAPED!
+        </h1>
+
+        <p id="gameOverText">
+            Congratulations!
+        </p>
+
+        <button id="menuButton">
+            🏠 Main Menu
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     THREE.JS
+===================================================== -->
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 
 
-<!-- FIREBASE -->
+<!-- =====================================================
+     FIREBASE + GAME
+===================================================== -->
 
 <script type="module">
 
@@ -475,16 +649,15 @@ import {
     ref,
     set,
     update,
-    onValue,
     get,
-    remove,
+    onValue,
     onDisconnect
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 
-/* =========================================================
+/* =====================================================
    FIREBASE CONFIG
-   ========================================================= */
+===================================================== */
 
 const firebaseConfig = {
   apiKey: "AIzaSyB2D31wQh9jApQagWeYMkG6ieJuY4xn8OA",
@@ -495,100 +668,134 @@ const firebaseConfig = {
   appId: "1:508583368014:web:8555b4194e68d728f43a1f",
   measurementId: "G-DVVE5XYMHE"
 };
+/* =====================================================
+   FIREBASE
+===================================================== */
 
-
-/* =========================================================
-   FIREBASE INITIALIZATION
-   ========================================================= */
-
-let firebaseReady = false;
 let db = null;
+let firebaseReady = false;
 
 try{
 
-    const app = initializeApp(firebaseConfig);
+    const app =
+        initializeApp(firebaseConfig);
 
-    db = getDatabase(app);
+    db =
+        getDatabase(app);
 
     firebaseReady = true;
 
-    console.log("Firebase connected");
+    console.log(
+        "🔥 Firebase connected"
+    );
 
 }catch(error){
 
-    console.error("Firebase error:",error);
+    console.error(
+        "Firebase initialization failed:",
+        error
+    );
 
 }
 
 
-/* =========================================================
-   GLOBAL GAME STATE
-   ========================================================= */
+/* =====================================================
+   STATE
+===================================================== */
 
-let roomId = null;
-let playerId = null;
-let playerName = null;
+const state = {
 
-let isHost = false;
+    roomId:null,
 
-let gameStarted = false;
-let gamePaused = false;
-let gameEnded = false;
+    playerId:
+        localStorage.getItem(
+            "escapeSchoolPlayerId"
+        ) ||
+        crypto.randomUUID(),
 
-let lastSaveTime = 0;
-let lastNetworkUpdate = 0;
+    playerName:"Player",
 
-let remotePlayers = {};
+    host:false,
 
-let collectedKeys = [];
+    started:false,
 
-let timeLeft = 240;
+    paused:false,
 
-let score = 0;
+    ended:false,
+
+    health:100,
+
+    time:240,
+
+    score:0,
+
+    keys:[],
+
+    finished:false
+
+};
 
 
-/* =========================================================
+localStorage.setItem(
+    "escapeSchoolPlayerId",
+    state.playerId
+);
+
+
+let roomPlayers = {};
+
+let remoteMeshes = {};
+
+let keysDown = {};
+
+let lastNetworkSend = 0;
+
+let lastSave = 0;
+
+let timerAccumulator = 0;
+
+let messageTimer = null;
+
+
+/* =====================================================
    DOM
-   ========================================================= */
+===================================================== */
 
 const menu =
     document.getElementById("menu");
 
-const nameSection =
-    document.getElementById("nameSection");
+const nameScreen =
+    document.getElementById("nameScreen");
 
-const roomSection =
-    document.getElementById("roomSection");
+const roomScreen =
+    document.getElementById("roomScreen");
 
 const playerNameInput =
     document.getElementById("playerName");
 
 const joinCodeInput =
-    document.getElementById("joinCode");
+    document.getElementById("joinCodeInput");
 
-const roomInfo =
-    document.getElementById("roomInfo");
+const roomCard =
+    document.getElementById("roomCard");
 
 const roomCode =
     document.getElementById("roomCode");
 
-const roomPlayers =
+const roomPlayersElement =
     document.getElementById("roomPlayers");
+
+const playersHud =
+    document.getElementById("playersHud");
 
 const timerElement =
     document.getElementById("timer");
 
-const keysElement =
-    document.getElementById("keys");
-
-const playersElement =
-    document.getElementById("players");
-
-const messageElement =
-    document.getElementById("message");
-
 const healthFill =
     document.getElementById("healthFill");
+
+const objective =
+    document.getElementById("objective");
 
 const saveStatus =
     document.getElementById("saveStatus");
@@ -596,62 +803,93 @@ const saveStatus =
 const pauseButton =
     document.getElementById("pauseButton");
 
+const pauseOverlay =
+    document.getElementById("pauseOverlay");
 
-/* =========================================================
-   PLAYER ID
-   ========================================================= */
+const messageElement =
+    document.getElementById("message");
 
-playerId =
-    localStorage.getItem("escapeSchoolPlayerId");
+const gameOver =
+    document.getElementById("gameOver");
 
-if(!playerId){
+const gameOverTitle =
+    document.getElementById("gameOverTitle");
 
-    playerId =
-        crypto.randomUUID();
+const gameOverText =
+    document.getElementById("gameOverText");
 
-    localStorage.setItem(
-        "escapeSchoolPlayerId",
-        playerId
+
+/* =====================================================
+   MENU
+===================================================== */
+
+document
+    .getElementById("continueButton")
+    .onclick = ()=>{
+
+        const name =
+            playerNameInput.value.trim();
+
+        if(!name){
+
+            alert(
+                "Enter your player name."
+            );
+
+            return;
+
+        }
+
+        state.playerName =
+            name;
+
+        localStorage.setItem(
+            "escapeSchoolPlayerName",
+            name
+        );
+
+        nameScreen
+            .classList
+            .add("hidden");
+
+        roomScreen
+            .classList
+            .remove("hidden");
+
+    };
+
+
+document
+    .getElementById("backButton")
+    .onclick = ()=>{
+
+        roomScreen
+            .classList
+            .add("hidden");
+
+        nameScreen
+            .classList
+            .remove("hidden");
+
+    };
+
+
+const savedName =
+    localStorage.getItem(
+        "escapeSchoolPlayerName"
     );
 
-}
+if(savedName){
 
-
-/* =========================================================
-   MENU
-   ========================================================= */
-
-function showRoomMenu(){
-
-    playerName =
-        playerNameInput.value.trim();
-
-    if(!playerName){
-
-        alert("Enter your player name first.");
-
-        return;
-    }
-
-    nameSection.classList.add("hidden");
-
-    roomSection.classList.remove("hidden");
+    playerNameInput.value =
+        savedName;
 
 }
 
 
-function showNameMenu(){
-
-    roomSection.classList.add("hidden");
-
-    nameSection.classList.remove("hidden");
-
-}
-
-
-/* =========================================================
+/* =====================================================
    ROOM CODE
-   ========================================================= */
+===================================================== */
 
 function generateRoomCode(){
 
@@ -665,7 +903,8 @@ function generateRoomCode(){
         result +=
             chars[
                 Math.floor(
-                    Math.random()*chars.length
+                    Math.random() *
+                    chars.length
                 )
             ];
 
@@ -676,222 +915,164 @@ function generateRoomCode(){
 }
 
 
-/* =========================================================
+/* =====================================================
    CREATE ROOM
-   ========================================================= */
+===================================================== */
 
-window.createRoom = async function(){
+document
+    .getElementById("createButton")
+    .onclick = async ()=>{
 
-    if(!firebaseReady){
+        if(!firebaseReady){
 
-        alert(
-            "Firebase is not configured yet. Put your Firebase config in the code."
-        );
+            alert(
+                "Firebase isn't configured. Add your Firebase config first."
+            );
 
-        return;
-    }
+            return;
 
-    const code =
-        generateRoomCode();
+        }
 
-    roomId = code;
+        const code =
+            generateRoomCode();
 
-    isHost = true;
+        state.roomId =
+            code;
 
-    const roomRef =
-        ref(db,"rooms/"+roomId);
+        state.host =
+            true;
 
-    await set(roomRef,{
+        await set(
+            ref(
+                db,
+                `rooms/${code}`
+            ),
+            {
 
-        host:playerId,
+                host:
+                    state.playerId,
 
-        started:false,
+                started:false,
 
-        createdAt:Date.now(),
+                createdAt:
+                    Date.now(),
 
-        players:{
+                players:{
 
-            [playerId]:{
+                    [state.playerId]:
+                    createPlayerData()
 
-                id:playerId,
-
-                name:playerName,
-
-                x:0,
-
-                y:1.7,
-
-                z:13,
-
-                yaw:0,
-
-                health:100,
-
-                keys:[],
-
-                alive:true,
-
-                connected:true
+                }
 
             }
-
-        }
-
-    });
-
-    roomCode.textContent =
-        code;
-
-    roomInfo.classList.remove("hidden");
-
-    listenToRoom();
-
-    setupDisconnect();
-
-};
-
-
-/* =========================================================
-   JOIN ROOM
-   ========================================================= */
-
-window.joinRoom = async function(){
-
-    if(!firebaseReady){
-
-        alert("Firebase is not configured.");
-
-        return;
-    }
-
-    const code =
-        joinCodeInput.value
-            .trim()
-            .toUpperCase();
-
-    if(code.length !== 6){
-
-        alert("Enter a valid 6-character room code.");
-
-        return;
-    }
-
-    const roomRef =
-        ref(db,"rooms/"+code);
-
-    const snapshot =
-        await get(roomRef);
-
-    if(!snapshot.exists()){
-
-        alert("Room does not exist.");
-
-        return;
-    }
-
-    const room =
-        snapshot.val();
-
-    if(room.started){
-
-        alert("This game has already started.");
-
-        return;
-    }
-
-    const players =
-        room.players || {};
-
-    if(Object.keys(players).length >= 5){
-
-        alert("Room is full.");
-
-        return;
-    }
-
-    roomId = code;
-
-    isHost = false;
-
-    await set(
-        ref(
-            db,
-            "rooms/"+roomId+
-            "/players/"+playerId
-        ),
-        {
-
-            id:playerId,
-
-            name:playerName,
-
-            x:0,
-
-            y:1.7,
-
-            z:13,
-
-            yaw:0,
-
-            health:100,
-
-            keys:[],
-
-            alive:true,
-
-            connected:true
-
-        }
-    );
-
-    roomCode.textContent =
-        code;
-
-    roomInfo.classList.remove("hidden");
-
-    listenToRoom();
-
-    setupDisconnect();
-
-};
-
-
-/* =========================================================
-   DISCONNECT HANDLER
-   ========================================================= */
-
-function setupDisconnect(){
-
-    if(!firebaseReady || !roomId)
-        return;
-
-    const playerRef =
-        ref(
-            db,
-            "rooms/"+roomId+
-            "/players/"+playerId+
-            "/connected"
         );
 
-    onDisconnect(playerRef)
-        .set(false);
+        roomCode.textContent =
+            code;
+
+        roomCard
+            .classList
+            .remove("hidden");
+
+        listenRoom();
+
+        setupDisconnect();
+
+    };
+
+
+/* =====================================================
+   PLAYER DATA
+===================================================== */
+
+function createPlayerData(){
+
+    return {
+
+        id:
+            state.playerId,
+
+        name:
+            state.playerName,
+
+        x:0,
+
+        y:1.7,
+
+        z:18,
+
+        yaw:0,
+
+        health:100,
+
+        keys:[],
+
+        score:0,
+
+        alive:true,
+
+        finished:false,
+
+        connected:true,
+
+        updatedAt:
+            Date.now()
+
+    };
 
 }
 
 
-/* =========================================================
-   ROOM LISTENER
-   ========================================================= */
+/* =====================================================
+   JOIN ROOM
+===================================================== */
 
-function listenToRoom(){
+document
+    .getElementById("joinButton")
+    .onclick = async ()=>{
 
-    const roomRef =
-        ref(db,"rooms/"+roomId);
+        if(!firebaseReady){
 
-    onValue(roomRef,(snapshot)=>{
+            alert(
+                "Firebase isn't configured."
+            );
 
-        if(!snapshot.exists())
             return;
+
+        }
+
+        const code =
+            joinCodeInput.value
+                .trim()
+                .toUpperCase();
+
+        if(code.length !== 6){
+
+            alert(
+                "Room codes are 6 characters."
+            );
+
+            return;
+
+        }
+
+        const snapshot =
+            await get(
+                ref(
+                    db,
+                    `rooms/${code}`
+                )
+            );
+
+        if(!snapshot.exists()){
+
+            alert(
+                "That room doesn't exist."
+            );
+
+            return;
+
+        }
 
         const room =
             snapshot.val();
@@ -899,145 +1080,237 @@ function listenToRoom(){
         const players =
             room.players || {};
 
+        if(room.started){
+
+            alert(
+                "That game has already started."
+            );
+
+            return;
+
+        }
+
+        if(
+            Object.keys(players).length >= 5
+        ){
+
+            alert(
+                "Room is full. Maximum 5 players."
+            );
+
+            return;
+
+        }
+
+        state.roomId =
+            code;
+
+        state.host =
+            false;
+
+        await set(
+            ref(
+                db,
+                `rooms/${code}/players/${state.playerId}`
+            ),
+            createPlayerData()
+        );
+
+        roomCode.textContent =
+            code;
+
+        roomCard
+            .classList
+            .remove("hidden");
+
+        listenRoom();
+
+        setupDisconnect();
+
+    };
+
+
+/* =====================================================
+   ROOM LISTENER
+===================================================== */
+
+function listenRoom(){
+
+    onValue(
+        ref(
+            db,
+            `rooms/${state.roomId}`
+        ),
+        snapshot=>{
+
+            if(!snapshot.exists())
+                return;
+
+            const room =
+                snapshot.val();
+
+            roomPlayers =
+                room.players || {};
+
+            renderPlayers();
+
+            if(
+                room.started &&
+                !state.started
+            ){
+
+                startGame();
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   RENDER PLAYERS
+===================================================== */
+
+function renderPlayers(){
+
+    const list =
+        Object.values(roomPlayers);
+
+    roomPlayersElement.innerHTML =
+        list.map(
+            p =>
+            `• ${escapeHTML(p.name || "Player")}
+             ${p.connected === false ? "🔴" : "🟢"}`
+        ).join("<br>");
+
+    playersHud.innerHTML =
+        list.map(
+            p =>
+            `${escapeHTML(p.name || "Player")}
+             — ${p.keys?.length || 0}/3
+             ${p.finished ? "🏆" : ""}`
+        ).join("<br>");
+
+}
+
+
+/* =====================================================
+   SAFE HTML
+===================================================== */
+
+function escapeHTML(text){
+
+    return String(text)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+
+}
+
+
+/* =====================================================
+   START ROOM
+===================================================== */
+
+document
+    .getElementById("startButton")
+    .onclick = async ()=>{
+
+        if(!state.host){
+
+            alert(
+                "Only the host can start."
+            );
+
+            return;
+
+        }
+
+        const snapshot =
+            await get(
+                ref(
+                    db,
+                    `rooms/${state.roomId}/players`
+                )
+            );
+
+        const players =
+            snapshot.exists()
+                ? snapshot.val()
+                : {};
+
         const count =
             Object.keys(players).length;
 
-        roomPlayers.innerHTML =
-            Object.values(players)
-            .map(
-                p =>
-                `${p.name || "Player"} ${p.connected === false ? "🔴" : "🟢"}`
-            )
-            .join("<br>");
+        if(count < 2){
 
-        playersElement.innerHTML =
-            Object.values(players)
-            .map(
-                p =>
-                `${p.name || "Player"} — ${p.keys ? p.keys.length : 0}/3`
-            )
-            .join("<br>");
+            alert(
+                "You need at least 2 players."
+            );
 
-        remotePlayers =
-            players;
-
-        if(room.started && !gameStarted){
-
-            beginGame();
+            return;
 
         }
 
-    });
-
-}
-
-
-/* =========================================================
-   START ROOM
-   ========================================================= */
-
-window.startRoom = async function(){
-
-    if(!isHost){
-
-        alert("Only the host can start the game.");
-
-        return;
-    }
-
-    const snapshot =
-        await get(
+        await update(
             ref(
                 db,
-                "rooms/"+roomId+"/players"
-            )
+                `rooms/${state.roomId}`
+            ),
+            {
+
+                started:true,
+
+                startedAt:
+                    Date.now(),
+
+                time:240
+
+            }
         );
 
-    const players =
-        snapshot.exists()
-            ? snapshot.val()
-            : {};
-
-    const count =
-        Object.keys(players).length;
-
-    if(count < 2){
-
-        alert("You need at least 2 players.");
-
-        return;
-    }
-
-    await update(
-        ref(db,"rooms/"+roomId),
-        {
-
-            started:true,
-
-            startedAt:Date.now(),
-
-            timeLeft:240
-
-        }
-    );
-
-};
+    };
 
 
-/* =========================================================
-   GAME
-   ========================================================= */
+/* =====================================================
+   DISCONNECT
+===================================================== */
 
-function beginGame(){
+function setupDisconnect(){
 
-    if(gameStarted)
+    if(!firebaseReady)
         return;
 
-    gameStarted = true;
+    const connectedRef =
+        ref(
+            db,
+            `rooms/${state.roomId}/players/${state.playerId}/connected`
+        );
 
-    menu.classList.add("hidden");
-
-    pauseButton.style.display =
-        "block";
-
-    showMessage(
-        "ESCAPE THE SCHOOL! Find all 3 keycards."
-    );
-
-    loadSavedGame();
-
-    requestAnimationFrame(
-        animate
-    );
+    onDisconnect(
+        connectedRef
+    ).set(false);
 
 }
 
 
-/* =========================================================
+/* =====================================================
    THREE.JS
-   ========================================================= */
+===================================================== */
 
 let scene;
+
 let camera;
+
 let renderer;
 
 let clock;
 
 let player;
-
-let playerHealth = 100;
-
-let keysDown = {};
-
-let yaw = 0;
-
-let pitch = 0;
-
-let objects = [];
-
-let keyObjects = [];
-
-let remoteMeshes = {};
 
 let enemy;
 
@@ -1045,33 +1318,39 @@ let terminal;
 
 let exitDoor;
 
+let keyObjects = [];
 
-/* =========================================================
-   INIT
-   ========================================================= */
+let colliders = [];
 
-function init3D(){
+
+/* =====================================================
+   INITIALIZE
+===================================================== */
+
+function initThree(){
 
     scene =
         new THREE.Scene();
 
     scene.background =
-        new THREE.Color(0x080b12);
+        new THREE.Color(
+            0x070a10
+        );
 
     scene.fog =
         new THREE.Fog(
-            0x080b12,
-            10,
-            70
+            0x070a10,
+            12,
+            85
         );
 
 
     camera =
         new THREE.PerspectiveCamera(
             75,
-            innerWidth/innerHeight,
+            innerWidth / innerHeight,
             .1,
-            100
+            150
         );
 
 
@@ -1080,12 +1359,23 @@ function init3D(){
             antialias:true
         });
 
+    renderer.setPixelRatio(
+        Math.min(
+            devicePixelRatio,
+            2
+        )
+    );
+
     renderer.setSize(
         innerWidth,
         innerHeight
     );
 
-    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.enabled =
+        true;
+
+    renderer.shadowMap.type =
+        THREE.PCFSoftShadowMap;
 
     document.body.appendChild(
         renderer.domElement
@@ -1096,9 +1386,9 @@ function init3D(){
         new THREE.Clock();
 
 
-    createLights();
+    setupLighting();
 
-    createSchool();
+    buildMap();
 
     createPlayer();
 
@@ -1115,62 +1405,97 @@ function init3D(){
 }
 
 
-init3D();
+initThree();
 
 
-/* =========================================================
+/* =====================================================
    LIGHTING
-   ========================================================= */
+===================================================== */
 
-function createLights(){
+function setupLighting(){
 
     const ambient =
         new THREE.HemisphereLight(
-            0x8899bb,
-            0x222222,
-            1
+            0x9bb4dd,
+            0x151515,
+            1.2
         );
 
     scene.add(ambient);
 
 
-    const light =
+    const main =
         new THREE.DirectionalLight(
             0xffffff,
             1.5
         );
 
-    light.position.set(
-        10,
-        20,
+    main.position.set(
+        15,
+        30,
         10
     );
 
-    light.castShadow = true;
+    main.castShadow =
+        true;
 
-    scene.add(light);
+    main.shadow.mapSize.width =
+        2048;
+
+    main.shadow.mapSize.height =
+        2048;
+
+    scene.add(main);
+
+
+    /* Ceiling lights */
+
+    for(
+        let z=-30;
+        z<=30;
+        z+=10
+    ){
+
+        const light =
+            new THREE.PointLight(
+                0xdde8ff,
+                1.4,
+                16
+            );
+
+        light.position.set(
+            0,
+            5.5,
+            z
+        );
+
+        scene.add(light);
+
+    }
 
 }
 
 
-/* =========================================================
+/* =====================================================
    MATERIAL
-   ========================================================= */
+===================================================== */
 
-function mat(color){
+function material(color){
 
     return new THREE.MeshStandardMaterial({
-        color
+        color,
+        roughness:.78,
+        metalness:.08
     });
 
 }
 
 
-/* =========================================================
+/* =====================================================
    BOX
-   ========================================================= */
+===================================================== */
 
-function box(
+function makeBox(
     x,
     y,
     z,
@@ -1188,7 +1513,7 @@ function box(
                 sy,
                 sz
             ),
-            mat(color)
+            material(color)
         );
 
     mesh.position.set(
@@ -1197,15 +1522,22 @@ function box(
         z
     );
 
-    mesh.castShadow = true;
+    mesh.castShadow =
+        true;
 
-    mesh.receiveShadow = true;
+    mesh.receiveShadow =
+        true;
 
     scene.add(mesh);
 
     if(collision){
 
-        objects.push(mesh);
+        colliders.push({
+            x,
+            z,
+            width:sx,
+            depth:sz
+        });
 
     }
 
@@ -1214,149 +1546,185 @@ function box(
 }
 
 
-/* =========================================================
-   SCHOOL
-   ========================================================= */
+/* =====================================================
+   MAP
+===================================================== */
 
-function createSchool(){
+function buildMap(){
 
     /* Floor */
 
-    box(
+    makeBox(
         0,
-        -0.5,
+        -.5,
         0,
-        45,
+        54,
         1,
-        55,
-        0x30343b,
+        74,
+        0x30343c,
         false
     );
 
 
     /* Outer walls */
 
-    box(
-        -22,
-        3,
-        0,
-        1,
-        7,
-        55,
-        0x1c222b
-    );
-
-    box(
-        22,
-        3,
-        0,
-        1,
-        7,
-        55,
-        0x1c222b
-    );
-
-    box(
-        0,
-        3,
+    makeBox(
         -27,
-        45,
-        7,
-        1,
-        0x1c222b
-    );
-
-    box(
+        3.5,
         0,
-        3,
+        1,
+        7,
+        74,
+        0x202630
+    );
+
+    makeBox(
         27,
-        45,
+        3.5,
+        0,
+        1,
+        7,
+        74,
+        0x202630
+    );
+
+    makeBox(
+        0,
+        3.5,
+        -37,
+        54,
         7,
         1,
-        0x1c222b
+        0x202630
+    );
+
+    makeBox(
+        0,
+        3.5,
+        37,
+        54,
+        7,
+        1,
+        0x202630
     );
 
 
-    /* Corridors */
+    /* Classroom walls */
 
-    for(let z=-20;z<=20;z+=8){
+    const wallColor =
+        0x444b57;
 
-        box(
-            -10,
-            2,
+
+    for(
+        let z=-28;
+        z<=28;
+        z+=14
+    ){
+
+        makeBox(
+            -15,
+            2.5,
             z,
             1,
-            4,
             5,
-            0x404650
+            9,
+            wallColor
         );
 
-        box(
-            10,
-            2,
+        makeBox(
+            15,
+            2.5,
             z,
             1,
-            4,
             5,
-            0x404650
+            9,
+            wallColor
         );
 
     }
 
 
-    /* Desks */
+    /* Central obstacles */
 
-    for(let z=-18;z<=18;z+=6){
+    for(
+        let z=-25;
+        z<=25;
+        z+=10
+    ){
 
-        for(let x=-6;x<=6;x+=4){
+        makeBox(
+            -6,
+            .8,
+            z,
+            3,
+            1.6,
+            2,
+            0x795548
+        );
 
-            box(
-                x,
-                .7,
-                z,
-                2.2,
-                1.2,
-                1.2,
-                0x795548
-            );
-
-        }
+        makeBox(
+            6,
+            .8,
+            z+3,
+            3,
+            1.6,
+            2,
+            0x795548
+        );
 
     }
 
 
     /* Lockers */
 
-    for(let z=-22;z<=22;z+=3){
+    for(
+        let z=-32;
+        z<=32;
+        z+=3
+    ){
 
-        box(
-            -19,
+        makeBox(
+            -23.5,
             2,
             z,
-            1.5,
+            2,
             4,
-            2.2,
-            0x38516e
+            2.3,
+            0x34506b
         );
 
-        box(
-            19,
+        makeBox(
+            23.5,
             2,
             z,
-            1.5,
+            2,
             4,
-            2.2,
-            0x38516e
+            2.3,
+            0x34506b
         );
 
     }
 
+
+    /* Ceiling */
+
+    makeBox(
+        0,
+        7,
+        0,
+        54,
+        .5,
+        74,
+        0x171b22,
+        false
+    );
+
 }
 
 
-/* =========================================================
+/* =====================================================
    PLAYER
-   ========================================================= */
+===================================================== */
 
 function createPlayer(){
 
@@ -1366,13 +1734,15 @@ function createPlayer(){
 
         y:1.7,
 
-        z:13,
+        z:29,
 
-        speed:6,
+        speed:7,
 
-        sprintSpeed:10,
+        sprintSpeed:11,
 
-        yaw:0
+        yaw:0,
+
+        pitch:0
 
     };
 
@@ -1385,57 +1755,51 @@ function createPlayer(){
 }
 
 
-/* =========================================================
-   KEYCARDS
-   ========================================================= */
+/* =====================================================
+   KEYS
+===================================================== */
 
 function createKeys(){
 
     const positions = [
 
-        [-15,1,-15],
+        [-20,1.2,-25],
 
-        [14,1,3],
+        [20,1.2,0],
 
-        [-12,1,18]
+        [-20,1.2,25]
 
     ];
 
+
     positions.forEach(
-        (p,index)=>{
+        (pos,index)=>{
 
-            const key =
+            const mesh =
                 new THREE.Mesh(
-
                     new THREE.BoxGeometry(
-                        .8,
-                        .12,
-                        .45
+                        .9,
+                        .15,
+                        .5
                     ),
-
                     new THREE.MeshStandardMaterial({
-                        color:0xffd21f,
-                        emissive:0x664400
+                        color:0xffd52e,
+                        emissive:0x604500,
+                        emissiveIntensity:.7
                     })
-
                 );
 
-            key.position.set(
-                p[0],
-                p[1],
-                p[2]
+            mesh.position.set(
+                ...pos
             );
 
-            key.rotation.y =
-                Math.PI/4;
-
-            scene.add(key);
+            scene.add(mesh);
 
             keyObjects.push({
 
-                mesh:key,
+                id:index,
 
-                id:index
+                mesh
 
             });
 
@@ -1445,86 +1809,104 @@ function createKeys(){
 }
 
 
-/* =========================================================
+/* =====================================================
    ENEMY
-   ========================================================= */
+===================================================== */
 
 function createEnemy(){
 
     enemy =
         new THREE.Mesh(
-
             new THREE.BoxGeometry(
-                1,
-                2,
-                1
+                1.2,
+                2.2,
+                1.2
             ),
-
-            mat(0xaa2222)
-
+            material(0xb82e38)
         );
 
     enemy.position.set(
         0,
-        1,
-        -15
+        1.1,
+        -5
     );
+
+    enemy.castShadow =
+        true;
 
     scene.add(enemy);
 
 }
 
 
-/* =========================================================
+/* =====================================================
    TERMINAL
-   ========================================================= */
+===================================================== */
 
 function createTerminal(){
 
     terminal =
-        box(
+        makeBox(
             0,
             1.5,
-            -23,
-            2,
+            -33,
+            2.2,
             3,
-            1,
-            0x222222
+            1.2,
+            0x242a34
         );
 
 }
 
 
-/* =========================================================
+/* =====================================================
    EXIT
-   ========================================================= */
+===================================================== */
 
 function createExit(){
 
     exitDoor =
-        box(
+        makeBox(
             0,
-            2.5,
-            25.5,
-            5,
-            5,
+            3,
+            34.5,
+            6,
+            6,
             1,
-            0x993333
+            0x9e3030
         );
+
+    exitDoor.userData.unlocked =
+        false;
 
 }
 
 
-/* =========================================================
+/* =====================================================
    MOUSE
-   ========================================================= */
+===================================================== */
 
 function setupMouse(){
+
+    renderer.domElement.tabIndex =
+        0;
+
 
     renderer.domElement.addEventListener(
         "click",
         ()=>{
-            renderer.domElement.requestPointerLock();
+
+            if(
+                state.started &&
+                !state.paused
+            ){
+
+                renderer.domElement.focus();
+
+                renderer.domElement.requestPointerLock();
+
+            }
+
         }
     );
 
@@ -1539,16 +1921,18 @@ function setupMouse(){
             )
                 return;
 
-            yaw -= e.movementX*.002;
+            player.yaw -=
+                e.movementX*.0022;
 
-            pitch -= e.movementY*.002;
+            player.pitch -=
+                e.movementY*.0022;
 
-            pitch =
+            player.pitch =
                 Math.max(
-                    -1.4,
+                    -1.45,
                     Math.min(
-                        1.4,
-                        pitch
+                        1.45,
+                        player.pitch
                     )
                 );
 
@@ -1558,35 +1942,49 @@ function setupMouse(){
 }
 
 
-/* =========================================================
+/* =====================================================
    KEYBOARD
-   ========================================================= */
+===================================================== */
 
 document.addEventListener(
     "keydown",
     e=>{
 
-        keysDown[e.code] = true;
+        keysDown[e.code] =
+            true;
 
         if(
-            e.code === "KeyW" ||
-            e.code === "KeyA" ||
-            e.code === "KeyS" ||
-            e.code === "KeyD" ||
-            e.code.startsWith("Arrow")
+            [
+                "KeyW",
+                "KeyA",
+                "KeyS",
+                "KeyD",
+                "ArrowUp",
+                "ArrowDown",
+                "ArrowLeft",
+                "ArrowRight",
+                "Space"
+            ].includes(e.code)
         ){
 
             e.preventDefault();
 
         }
 
-        if(e.code === "KeyE"){
+
+        if(
+            e.code === "KeyE"
+        ){
 
             interact();
 
         }
 
-        if(e.code === "Escape"){
+
+        if(
+            e.code === "Escape" &&
+            state.started
+        ){
 
             togglePause();
 
@@ -1600,7 +1998,8 @@ document.addEventListener(
     "keyup",
     e=>{
 
-        keysDown[e.code] = false;
+        keysDown[e.code] =
+            false;
 
     }
 );
@@ -1616,225 +2015,87 @@ window.addEventListener(
 );
 
 
-/* =========================================================
-   MOBILE
-   ========================================================= */
+/* =====================================================
+   MOBILE CONTROLS
+===================================================== */
 
-document.querySelectorAll(
-    ".mobileButton"
-).forEach(button=>{
+document
+    .querySelectorAll(".mobileButton")
+    .forEach(button=>{
 
-    const key =
-        button.dataset.key;
+        const key =
+            button.dataset.key;
 
-    button.addEventListener(
+        button.addEventListener(
+            "touchstart",
+            e=>{
+
+                e.preventDefault();
+
+                keysDown[key] =
+                    true;
+
+            },
+            {passive:false}
+        );
+
+        button.addEventListener(
+            "touchend",
+            e=>{
+
+                e.preventDefault();
+
+                keysDown[key] =
+                    false;
+
+            },
+            {passive:false}
+        );
+
+    });
+
+
+document
+    .getElementById("mobileInteract")
+    .addEventListener(
         "touchstart",
         e=>{
 
             e.preventDefault();
 
-            keysDown[key] = true;
+            interact();
 
-        }
+        },
+        {passive:false}
     );
 
-    button.addEventListener(
-        "touchend",
-        e=>{
 
-            e.preventDefault();
-
-            keysDown[key] = false;
-
-        }
-    );
-
-});
-
-
-/* =========================================================
-   MOVEMENT
-   ========================================================= */
-
-function updatePlayer(delta){
-
-    if(
-        !gameStarted ||
-        gamePaused ||
-        gameEnded
-    )
-        return;
-
-
-    let forward = 0;
-
-    let strafe = 0;
-
-
-    if(
-        keysDown.KeyW ||
-        keysDown.ArrowUp
-    ){
-
-        forward += 1;
-
-    }
-
-
-    if(
-        keysDown.KeyS ||
-        keysDown.ArrowDown
-    ){
-
-        forward -= 1;
-
-    }
-
-
-    if(
-        keysDown.KeyD ||
-        keysDown.ArrowRight
-    ){
-
-        strafe += 1;
-
-    }
-
-
-    if(
-        keysDown.KeyA ||
-        keysDown.ArrowLeft
-    ){
-
-        strafe -= 1;
-
-    }
-
-
-    if(
-        forward === 0 &&
-        strafe === 0
-    )
-        return;
-
-
-    const magnitude =
-        Math.sqrt(
-            forward*forward +
-            strafe*strafe
-        );
-
-
-    forward /= magnitude;
-
-    strafe /= magnitude;
-
-
-    let speed =
-        keysDown.ShiftLeft ||
-        keysDown.ShiftRight
-            ? player.sprintSpeed
-            : player.speed;
-
-
-    const distance =
-        speed*delta;
-
-
-    const forwardX =
-        Math.sin(yaw);
-
-    const forwardZ =
-        Math.cos(yaw);
-
-
-    const rightX =
-        Math.cos(yaw);
-
-    const rightZ =
-        -Math.sin(yaw);
-
-
-    const moveX =
-        forwardX*forward*distance +
-        rightX*strafe*distance;
-
-
-    const moveZ =
-        forwardZ*forward*distance +
-        rightZ*strafe*distance;
-
-
-    movePlayer(
-        moveX,
-        moveZ
-    );
-
-}
-
-
-/* =========================================================
+/* =====================================================
    COLLISION
-   ========================================================= */
+===================================================== */
 
-function movePlayer(dx,dz){
-
-    const oldX =
-        player.x;
-
-    const oldZ =
-        player.z;
-
-
-    player.x += dx;
-
-    if(checkCollision()){
-
-        player.x =
-            oldX;
-
-    }
-
-
-    player.z += dz;
-
-    if(checkCollision()){
-
-        player.z =
-            oldZ;
-
-    }
-
-
-    camera.position.set(
-        player.x,
-        player.y,
-        player.z
-    );
-
-}
-
-
-function checkCollision(){
+function collides(x,z){
 
     const radius =
         .45;
 
 
     for(
-        const obj of objects
+        const c of colliders
     ){
 
-        const box =
-            new THREE.Box3()
-                .setFromObject(obj);
-
-
         if(
-            player.x + radius > box.min.x &&
-            player.x - radius < box.max.x &&
-            player.z + radius > box.min.z &&
-            player.z - radius < box.max.z
+            x+radius >
+                c.x-c.width/2 &&
+
+            x-radius <
+                c.x+c.width/2 &&
+
+            z+radius >
+                c.z-c.depth/2 &&
+
+            z-radius <
+                c.z+c.depth/2
         ){
 
             return true;
@@ -1848,9 +2109,179 @@ function checkCollision(){
 }
 
 
-/* =========================================================
-   LOOK
-   ========================================================= */
+/* =====================================================
+   MOVEMENT
+===================================================== */
+
+function updateMovement(delta){
+
+    if(
+        !state.started ||
+        state.paused ||
+        state.ended
+    )
+        return;
+
+
+    let forward = 0;
+
+    let strafe = 0;
+
+
+    if(
+        keysDown.KeyW ||
+        keysDown.ArrowUp
+    )
+        forward++;
+
+
+    if(
+        keysDown.KeyS ||
+        keysDown.ArrowDown
+    )
+        forward--;
+
+
+    if(
+        keysDown.KeyD ||
+        keysDown.ArrowRight
+    )
+        strafe++;
+
+
+    if(
+        keysDown.KeyA ||
+        keysDown.ArrowLeft
+    )
+        strafe--;
+
+
+    if(
+        forward === 0 &&
+        strafe === 0
+    )
+        return;
+
+
+    const length =
+        Math.hypot(
+            forward,
+            strafe
+        );
+
+
+    forward /= length;
+
+    strafe /= length;
+
+
+    const speed =
+        keysDown.ShiftLeft ||
+        keysDown.ShiftRight
+            ? player.sprintSpeed
+            : player.speed;
+
+
+    const distance =
+        speed * delta;
+
+
+    const fx =
+        Math.sin(
+            player.yaw
+        );
+
+    const fz =
+        Math.cos(
+            player.yaw
+        );
+
+
+    const rx =
+        Math.cos(
+            player.yaw
+        );
+
+    const rz =
+        -Math.sin(
+            player.yaw
+        );
+
+
+    const dx =
+        (
+            fx*forward +
+            rx*strafe
+        ) * distance;
+
+
+    const dz =
+        (
+            fz*forward +
+            rz*strafe
+        ) * distance;
+
+
+    movePlayer(
+        dx,
+        dz
+    );
+
+}
+
+
+/* =====================================================
+   SAFE MOVEMENT
+===================================================== */
+
+function movePlayer(dx,dz){
+
+    const nextX =
+        player.x + dx;
+
+
+    if(
+        !collides(
+            nextX,
+            player.z
+        )
+    ){
+
+        player.x =
+            nextX;
+
+    }
+
+
+    const nextZ =
+        player.z + dz;
+
+
+    if(
+        !collides(
+            player.x,
+            nextZ
+        )
+    ){
+
+        player.z =
+            nextZ;
+
+    }
+
+
+    camera.position.set(
+        player.x,
+        player.y,
+        player.z
+    );
+
+}
+
+
+/* =====================================================
+   CAMERA
+===================================================== */
 
 function updateCamera(){
 
@@ -1858,130 +2289,193 @@ function updateCamera(){
         "YXZ";
 
     camera.rotation.y =
-        -yaw;
+        -player.yaw;
 
     camera.rotation.x =
-        pitch;
+        player.pitch;
 
 }
 
 
-/* =========================================================
+/* =====================================================
    KEY COLLECTION
-   ========================================================= */
+===================================================== */
 
 function checkKeys(){
 
-    keyObjects.forEach(
-        item=>{
+    for(
+        const item of keyObjects
+    ){
 
-            if(
-                collectedKeys.includes(
-                    item.id
-                )
+        if(
+            state.keys.includes(
+                item.id
             )
-                return;
+        )
+            continue;
 
 
-            const dx =
-                player.x -
-                item.mesh.position.x;
+        const dx =
+            player.x -
+            item.mesh.position.x;
 
 
-            const dz =
-                player.z -
-                item.mesh.position.z;
+        const dz =
+            player.z -
+            item.mesh.position.z;
 
 
-            const distance =
-                Math.sqrt(
-                    dx*dx +
-                    dz*dz
-                );
+        if(
+            Math.hypot(
+                dx,
+                dz
+            ) < 2
+        ){
 
+            state.keys.push(
+                item.id
+            );
 
-            if(distance < 2){
+            item.mesh.visible =
+                false;
 
-                collectedKeys.push(
-                    item.id
-                );
+            state.score +=
+                100;
 
-                item.mesh.visible =
-                    false;
+            updateHUD();
 
-                score += 100;
+            showMessage(
+                `🔑 Keycard ${item.id+1}/3 collected!`
+            );
 
-                updateHUD();
-
-                showMessage(
-                    `🔑 Keycard ${item.id+1} collected!`
-                );
-
-                saveGame();
-
-            }
+            saveGame();
 
         }
-    );
 
-}
-
-
-/* =========================================================
-   INTERACTION
-   ========================================================= */
-
-function interact(){
-
-    if(!gameStarted || gamePaused)
-        return;
-
-
-    const distance =
-        player.z -
-        terminal.position.z;
+    }
 
 
     if(
-        Math.abs(distance) < 4 &&
-        collectedKeys.length === 3
+        state.keys.length === 3
     ){
 
-        const answer =
-            prompt(
-                "Terminal puzzle:\n\n2 + 4 × 3 = ?"
-            );
-
-
-        if(answer === "14"){
-
-            showMessage(
-                "🟢 Terminal unlocked!"
-            );
-
-            exitDoor.material.color.set(
-                0x22aa44
-            );
-
-            exitDoor.userData.unlocked =
-                true;
-
-        }else{
-
-            showMessage(
-                "❌ Incorrect!"
-            );
-
-        }
+        objective.textContent =
+            "Go to terminal";
 
     }
 
 }
 
 
-/* =========================================================
+/* =====================================================
+   TERMINAL
+===================================================== */
+
+function interact(){
+
+    if(
+        !state.started ||
+        state.paused ||
+        state.ended
+    )
+        return;
+
+
+    const terminalDistance =
+        Math.hypot(
+            player.x -
+                terminal.position.x,
+
+            player.z -
+                terminal.position.z
+        );
+
+
+    if(
+        terminalDistance > 4
+    ){
+
+        showMessage(
+            "Nothing to interact with here."
+        );
+
+        return;
+
+    }
+
+
+    if(
+        state.keys.length < 3
+    ){
+
+        showMessage(
+            `You need ${3-state.keys.length} more keycard(s).`
+        );
+
+        return;
+
+    }
+
+
+    if(
+        exitDoor.userData.unlocked
+    ){
+
+        showMessage(
+            "The exit is already unlocked!"
+        );
+
+        return;
+
+    }
+
+
+    const answer =
+        prompt(
+            "SECURITY TERMINAL\n\n" +
+            "Solve:\n\n" +
+            "2 + 4 × 3 = ?"
+        );
+
+
+    if(
+        answer === "14"
+    ){
+
+        exitDoor.userData.unlocked =
+            true;
+
+        exitDoor.material.color.set(
+            0x22a653
+        );
+
+        state.score +=
+            250;
+
+        objective.textContent =
+            "Escape through the green door!";
+
+        showMessage(
+            "🟢 ACCESS GRANTED! RUN!"
+        );
+
+        saveGame();
+
+    }else{
+
+        showMessage(
+            "🔴 ACCESS DENIED!"
+
+        );
+
+    }
+
+}
+
+
+/* =====================================================
    EXIT
-   ========================================================= */
+===================================================== */
 
 function checkExit(){
 
@@ -1991,37 +2485,36 @@ function checkExit(){
         return;
 
 
-    const dx =
-        player.x -
-        exitDoor.position.x;
+    const distance =
+        Math.hypot(
+            player.x -
+                exitDoor.position.x,
 
-
-    const dz =
-        player.z -
-        exitDoor.position.z;
+            player.z -
+                exitDoor.position.z
+        );
 
 
     if(
-        Math.sqrt(dx*dx+dz*dz)
-        < 4
+        distance < 5
     ){
 
-        winGame();
+        finishGame();
 
     }
 
 }
 
 
-/* =========================================================
-   ENEMY AI
-   ========================================================= */
+/* =====================================================
+   ENEMY
+===================================================== */
 
 function updateEnemy(delta){
 
     if(
-        gamePaused ||
-        gameEnded
+        state.paused ||
+        state.ended
     )
         return;
 
@@ -2037,47 +2530,81 @@ function updateEnemy(delta){
 
 
     const distance =
-        Math.sqrt(
-            dx*dx +
-            dz*dz
+        Math.hypot(
+            dx,
+            dz
         );
 
 
     if(
-        distance < 18
+        distance < 20 &&
+        distance > .1
     ){
 
-        enemy.position.x +=
-            dx/distance *
-            delta *
-            2.5;
+        const speed =
+            2.2;
 
 
-        enemy.position.z +=
-            dz/distance *
-            delta *
-            2.5;
+        const nx =
+            enemy.position.x +
+            (dx/distance) *
+            speed *
+            delta;
+
+
+        const nz =
+            enemy.position.z +
+            (dz/distance) *
+            speed *
+            delta;
+
+
+        if(
+            !collides(
+                nx,
+                enemy.position.z
+            )
+        ){
+
+            enemy.position.x =
+                nx;
+
+        }
+
+
+        if(
+            !collides(
+                enemy.position.x,
+                nz
+            )
+        ){
+
+            enemy.position.z =
+                nz;
+
+        }
 
     }
 
 
     if(
-        distance < 1.5
+        distance < 1.6
     ){
 
-        playerHealth -=
-            delta*12;
+        state.health -=
+            delta * 15;
 
-        playerHealth =
+        state.health =
             Math.max(
                 0,
-                playerHealth
+                state.health
             );
 
         updateHUD();
 
+
         if(
-            playerHealth <= 0
+            state.health <= 0
         ){
 
             loseGame();
@@ -2089,50 +2616,74 @@ function updateEnemy(delta){
 }
 
 
-/* =========================================================
+/* =====================================================
+   REMOTE PLAYER COLORS
+===================================================== */
+
+function createRemoteMesh(id){
+
+    const color =
+        new THREE.Color(
+            `hsl(${Math.floor(
+                Math.random()*360
+            )},70%,55%)`
+        );
+
+
+    const mesh =
+        new THREE.Mesh(
+            new THREE.CapsuleGeometry(
+                .45,
+                1.1,
+                5,
+                10
+            ),
+            new THREE.MeshStandardMaterial({
+                color
+            })
+        );
+
+
+    mesh.castShadow =
+        true;
+
+    scene.add(mesh);
+
+    remoteMeshes[id] =
+        mesh;
+
+}
+
+
+/* =====================================================
    REMOTE PLAYERS
-   ========================================================= */
+===================================================== */
 
 function updateRemotePlayers(){
 
-    if(!gameStarted)
+    if(!state.started)
         return;
 
 
     Object.values(
-        remotePlayers
+        roomPlayers
     ).forEach(
         p=>{
 
             if(
-                p.id === playerId
+                p.id ===
+                state.playerId
             )
                 return;
 
 
-            if(!remoteMeshes[p.id]){
+            if(
+                !remoteMeshes[p.id]
+            ){
 
-                const mesh =
-                    new THREE.Mesh(
-
-                        new THREE.CapsuleGeometry(
-                            .45,
-                            1.1,
-                            4,
-                            8
-                        ),
-
-                        mat(
-                            Math.random() *
-                            0xffffff
-                        )
-
-                    );
-
-                scene.add(mesh);
-
-                remoteMeshes[p.id] =
-                    mesh;
+                createRemoteMesh(
+                    p.id
+                );
 
             }
 
@@ -2141,10 +2692,13 @@ function updateRemotePlayers(){
                 remoteMeshes[p.id];
 
 
-            mesh.position.set(
-                p.x || 0,
-                p.y || 1.7,
-                p.z || 0
+            mesh.position.lerp(
+                new THREE.Vector3(
+                    p.x || 0,
+                    p.y || 1.7,
+                    p.z || 0
+                ),
+                .35
             );
 
 
@@ -2157,66 +2711,20 @@ function updateRemotePlayers(){
 
     Object.keys(
         remoteMeshes
-    ).forEach(id=>{
+    ).forEach(
+        id=>{
 
-        if(
-            !remotePlayers[id]
-        ){
+            if(
+                !roomPlayers[id]
+            ){
 
-            scene.remove(
-                remoteMeshes[id]
-            );
+                scene.remove(
+                    remoteMeshes[id]
+                );
 
-            delete remoteMeshes[id];
+                delete remoteMeshes[id];
 
-        }
-
-    });
-
-}
-
-
-/* =========================================================
-   NETWORK UPDATE
-   ========================================================= */
-
-async function sendPlayerState(){
-
-    if(
-        !firebaseReady ||
-        !roomId ||
-        !gameStarted
-    )
-        return;
-
-
-    const playerRef =
-        ref(
-            db,
-            "rooms/"+roomId+
-            "/players/"+playerId
-        );
-
-
-    await update(
-        playerRef,
-        {
-
-            x:player.x,
-
-            y:player.y,
-
-            z:player.z,
-
-            yaw:yaw,
-
-            health:playerHealth,
-
-            keys:collectedKeys,
-
-            alive:playerHealth > 0,
-
-            connected:true
+            }
 
         }
     );
@@ -2224,50 +2732,144 @@ async function sendPlayerState(){
 }
 
 
-/* =========================================================
-   SAVE GAME
-   ========================================================= */
+/* =====================================================
+   NETWORK SYNC
+===================================================== */
+
+async function syncPlayer(){
+
+    if(
+        !firebaseReady ||
+        !state.roomId ||
+        !state.started
+    )
+        return;
+
+
+    const now =
+        Date.now();
+
+
+    if(
+        now-lastNetworkSend <
+        120
+    )
+        return;
+
+
+    lastNetworkSend =
+        now;
+
+
+    try{
+
+        await update(
+            ref(
+                db,
+                `rooms/${state.roomId}/players/${state.playerId}`
+            ),
+            {
+
+                x:player.x,
+
+                y:player.y,
+
+                z:player.z,
+
+                yaw:player.yaw,
+
+                health:state.health,
+
+                keys:state.keys,
+
+                score:state.score,
+
+                alive:
+                    state.health > 0,
+
+                finished:
+                    state.finished,
+
+                connected:true,
+
+                updatedAt:now
+
+            }
+        );
+
+    }catch(error){
+
+        console.error(
+            "Network sync:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   SAVE
+===================================================== */
 
 async function saveGame(){
 
     const saveData = {
 
-        playerId,
+        playerId:
+            state.playerId,
 
-        playerName,
+        playerName:
+            state.playerName,
 
-        roomId,
+        roomId:
+            state.roomId,
 
-        x:player.x,
+        x:
+            player.x,
 
-        y:player.y,
+        y:
+            player.y,
 
-        z:player.z,
+        z:
+            player.z,
 
-        yaw,
+        yaw:
+            player.yaw,
 
-        health:playerHealth,
+        pitch:
+            player.pitch,
 
-        keys:collectedKeys,
+        health:
+            state.health,
 
-        timeLeft,
+        time:
+            state.time,
 
-        score,
+        keys:
+            [...state.keys],
 
-        savedAt:Date.now()
+        score:
+            state.score,
+
+        savedAt:
+            Date.now()
 
     };
 
 
-    /* Local save */
+    /* Local */
 
     localStorage.setItem(
         "escapeSchoolSave",
-        JSON.stringify(saveData)
+        JSON.stringify(
+            saveData
+        )
     );
 
 
-    /* Firebase save */
+    /* Cloud */
 
     if(
         firebaseReady
@@ -2278,19 +2880,18 @@ async function saveGame(){
             await set(
                 ref(
                     db,
-                    "saves/"+playerId
+                    `saves/${state.playerId}`
                 ),
                 saveData
             );
 
             saveStatus.textContent =
-                "☁️ Saved "+new Date()
-                .toLocaleTimeString();
+                "☁️ Cloud saved";
 
         }catch(error){
 
             console.error(
-                "Save error:",
+                "Cloud save:",
                 error
             );
 
@@ -2299,21 +2900,24 @@ async function saveGame(){
 
         }
 
+    }else{
+
+        saveStatus.textContent =
+            "💾 Local save";
+
     }
 
 }
 
 
-/* =========================================================
+/* =====================================================
    LOAD SAVE
-   ========================================================= */
+===================================================== */
 
-async function loadSavedGame(){
+async function loadSave(){
 
     let save = null;
 
-
-    /* Firebase first */
 
     if(
         firebaseReady
@@ -2325,7 +2929,7 @@ async function loadSavedGame(){
                 await get(
                     ref(
                         db,
-                        "saves/"+playerId
+                        `saves/${state.playerId}`
                     )
                 );
 
@@ -2341,14 +2945,15 @@ async function loadSavedGame(){
 
         }catch(error){
 
-            console.error(error);
+            console.error(
+                "Load cloud save:",
+                error
+            );
 
         }
 
     }
 
-
-    /* Local fallback */
 
     if(!save){
 
@@ -2357,14 +2962,23 @@ async function loadSavedGame(){
                 "escapeSchoolSave"
             );
 
+
         if(local){
 
             try{
 
                 save =
-                    JSON.parse(local);
+                    JSON.parse(
+                        local
+                    );
 
-            }catch(e){}
+            }catch(error){
+
+                console.error(
+                    error
+                );
+
+            }
 
         }
 
@@ -2375,18 +2989,19 @@ async function loadSavedGame(){
         return;
 
 
-    const useSave =
+    const continueSave =
         confirm(
-            "💾 A saved game was found.\n\n" +
-            "Saved: "+
+            "💾 SAVED GAME FOUND\n\n" +
+            "Saved: " +
             new Date(
                 save.savedAt
-            ).toLocaleString()+
-            "\n\nContinue it?"
+            ).toLocaleString() +
+            "\n\n" +
+            "Continue your previous progress?"
         );
 
 
-    if(!useSave)
+    if(!continueSave)
         return;
 
 
@@ -2397,21 +3012,26 @@ async function loadSavedGame(){
         save.y ?? 1.7;
 
     player.z =
-        save.z ?? 13;
+        save.z ?? 29;
 
-    yaw =
+    player.yaw =
         save.yaw ?? 0;
 
-    playerHealth =
+    player.pitch =
+        save.pitch ?? 0;
+
+    state.health =
         save.health ?? 100;
 
-    collectedKeys =
-        save.keys ?? [];
+    state.time =
+        save.time ?? 240;
 
-    timeLeft =
-        save.timeLeft ?? 240;
+    state.keys =
+        Array.isArray(save.keys)
+            ? save.keys
+            : [];
 
-    score =
+    state.score =
         save.score ?? 0;
 
 
@@ -2419,7 +3039,7 @@ async function loadSavedGame(){
         item=>{
 
             item.mesh.visible =
-                !collectedKeys.includes(
+                !state.keys.includes(
                     item.id
                 );
 
@@ -2427,73 +3047,154 @@ async function loadSavedGame(){
     );
 
 
+    camera.position.set(
+        player.x,
+        player.y,
+        player.z
+    );
+
+
     updateHUD();
 
     showMessage(
-        "💾 Save loaded!"
+        "💾 Your save has been restored!"
     );
 
 }
 
 
-/* =========================================================
-   PAUSE
-   ========================================================= */
+/* =====================================================
+   START GAME
+===================================================== */
 
-window.togglePause = function(){
+async function startGame(){
+
+    if(state.started)
+        return;
+
+
+    state.started =
+        true;
+
+    state.paused =
+        false;
+
+    state.ended =
+        false;
+
+
+    menu.classList.add(
+        "hidden"
+    );
+
+
+    pauseButton.style.display =
+        "block";
+
+
+    renderer.domElement.focus();
+
+
+    await loadSave();
+
+
+    showMessage(
+        "🏫 Find the 3 keycards and escape!"
+    );
+
+}
+
+
+/* =====================================================
+   PAUSE
+===================================================== */
+
+function togglePause(){
 
     if(
-        !gameStarted ||
-        gameEnded
+        !state.started ||
+        state.ended
     )
         return;
 
 
-    gamePaused =
-        !gamePaused;
+    state.paused =
+        !state.paused;
 
 
-    pauseButton.textContent =
-        gamePaused
-            ? "▶️ Resume"
-            : "⏸️ Pause";
+    if(state.paused){
 
+        pauseOverlay
+            .classList
+            .remove("hidden");
 
-    if(gamePaused){
+        pauseButton.textContent =
+            "▶️ Resume";
 
         saveGame();
 
-        showMessage(
-            "⏸️ Game paused — progress saved."
-        );
+        if(
+            document.pointerLockElement
+        ){
+
+            document.exitPointerLock();
+
+        }
 
     }else{
 
-        showMessage(
-            "▶️ Game resumed!"
-        );
+        pauseOverlay
+            .classList
+            .add("hidden");
+
+        pauseButton.textContent =
+            "⏸️ Pause";
+
+        renderer.domElement.focus();
 
     }
 
-};
+}
 
 
-/* =========================================================
+pauseButton.onclick =
+    togglePause;
+
+
+document
+    .getElementById("resumeButton")
+    .onclick =
+    togglePause;
+
+
+document
+    .getElementById("saveExitButton")
+    .onclick =
+    async ()=>{
+
+        await saveGame();
+
+        location.reload();
+
+    };
+
+
+/* =====================================================
    TIMER
-   ========================================================= */
-
-let timerAccumulator = 0;
+===================================================== */
 
 function updateTimer(delta){
 
     if(
-        gamePaused ||
-        gameEnded
+        !state.started ||
+        state.paused ||
+        state.ended
     )
         return;
 
 
-    timerAccumulator += delta;
+    timerAccumulator +=
+        delta;
 
 
     if(
@@ -2502,19 +3203,20 @@ function updateTimer(delta){
 
         timerAccumulator = 0;
 
-        timeLeft--;
+        state.time--;
 
-        timeLeft =
+        state.time =
             Math.max(
                 0,
-                timeLeft
+                state.time
             );
+
 
         updateHUD();
 
 
         if(
-            timeLeft <= 0
+            state.time <= 0
         ){
 
             loseGame();
@@ -2526,40 +3228,48 @@ function updateTimer(delta){
 }
 
 
-/* =========================================================
+/* =====================================================
    HUD
-   ========================================================= */
+===================================================== */
 
 function updateHUD(){
 
     healthFill.style.width =
-        playerHealth+"%";
+        `${state.health}%`;
 
 
-    keysElement.textContent =
-        `${collectedKeys.length} / 3`;
-
-
-    const minutes =
+    const mins =
         Math.floor(
-            timeLeft/60
+            state.time/60
         );
 
-    const seconds =
-        timeLeft%60;
+
+    const secs =
+        state.time%60;
 
 
     timerElement.textContent =
-        `${String(minutes).padStart(2,"0")}:${String(seconds).padStart(2,"0")}`;
+        `${String(mins).padStart(2,"0")}:${String(secs).padStart(2,"0")}`;
+
+
+    if(
+        state.keys.length < 3
+    ){
+
+        objective.textContent =
+            `Find ${3-state.keys.length} keycard(s)`;
+
+    }
+
+
+    renderPlayers();
 
 }
 
 
-/* =========================================================
+/* =====================================================
    MESSAGE
-   ========================================================= */
-
-let messageTimeout;
+===================================================== */
 
 function showMessage(text){
 
@@ -2571,11 +3281,11 @@ function showMessage(text){
 
 
     clearTimeout(
-        messageTimeout
+        messageTimer
     );
 
 
-    messageTimeout =
+    messageTimer =
         setTimeout(
             ()=>{
                 messageElement.style.opacity =
@@ -2587,47 +3297,50 @@ function showMessage(text){
 }
 
 
-/* =========================================================
-   WIN
-   ========================================================= */
+/* =====================================================
+   FINISH
+===================================================== */
 
-async function winGame(){
+async function finishGame(){
 
-    if(gameEnded)
+    if(
+        state.ended
+    )
         return;
 
 
-    gameEnded = true;
+    state.ended =
+        true;
 
-    score +=
-        Math.max(
-            0,
-            timeLeft*10
-        );
+    state.finished =
+        true;
+
+
+    state.score +=
+        state.time * 10;
 
 
     await saveGame();
 
 
-    if(
-        firebaseReady &&
-        roomId
-    ){
+    if(firebaseReady){
 
         await update(
             ref(
                 db,
-                "rooms/"+roomId+
-                "/players/"+playerId
+                `rooms/${state.roomId}/players/${state.playerId}`
             ),
             {
 
                 finished:true,
 
+                score:
+                    state.score,
+
                 finishTime:
                     Date.now(),
 
-                score
+                connected:true
 
             }
         );
@@ -2635,84 +3348,67 @@ async function winGame(){
     }
 
 
-    document
-        .getElementById(
-            "gameOver"
-        )
-        .classList.remove(
-            "hidden"
-        );
+    gameOver
+        .classList
+        .remove("hidden");
 
 
-    document
-        .getElementById(
-            "gameOverTitle"
-        )
-        .textContent =
-            "🏆 YOU ESCAPED!";
+    gameOverTitle.textContent =
+        "🏆 YOU ESCAPED!";
 
 
-    document
-        .getElementById(
-            "gameOverText"
-        )
-        .textContent =
-            `Score: ${score} — You escaped the school!`;
+    gameOverText.innerHTML =
+        `You escaped the school!<br><br>` +
+        `Score: <b>${state.score}</b><br>` +
+        `Keycards: 3/3`;
 
 }
 
 
-/* =========================================================
+/* =====================================================
    LOSE
-   ========================================================= */
+===================================================== */
 
 async function loseGame(){
 
-    if(gameEnded)
+    if(
+        state.ended
+    )
         return;
 
 
-    gameEnded = true;
+    state.ended =
+        true;
+
 
     await saveGame();
 
 
-    document
-        .getElementById(
-            "gameOver"
-        )
-        .classList.remove(
-            "hidden"
-        );
+    gameOver
+        .classList
+        .remove("hidden");
 
 
-    document
-        .getElementById(
-            "gameOverTitle"
-        )
-        .textContent =
-            "💀 GAME OVER";
+    gameOverTitle.textContent =
+        "💀 GAME OVER";
 
 
-    document
-        .getElementById(
-            "gameOverText"
-        )
-        .textContent =
-            "You didn't escape in time!";
+    gameOverText.innerHTML =
+        `You didn't escape in time.<br><br>` +
+        `Your progress has been saved.`;
 
 }
 
 
-/* =========================================================
+/* =====================================================
    AUTO SAVE
-   ========================================================= */
+===================================================== */
 
-async function automaticSave(){
+async function autoSave(){
 
     if(
-        !gameStarted ||
-        gameEnded
+        !state.started ||
+        state.ended
     )
         return;
 
@@ -2722,13 +3418,13 @@ async function automaticSave(){
 
 
     if(
-        now-lastSaveTime <
+        now-lastSave <
         10000
     )
         return;
 
 
-    lastSaveTime =
+    lastSave =
         now;
 
 
@@ -2737,9 +3433,9 @@ async function automaticSave(){
 }
 
 
-/* =========================================================
-   ANIMATION
-   ========================================================= */
+/* =====================================================
+   MAIN LOOP
+===================================================== */
 
 function animate(){
 
@@ -2755,7 +3451,9 @@ function animate(){
         );
 
 
-    updatePlayer(delta);
+    updateMovement(
+        delta
+    );
 
     updateCamera();
 
@@ -2763,13 +3461,19 @@ function animate(){
 
     checkExit();
 
-    updateEnemy(delta);
+    updateEnemy(
+        delta
+    );
 
     updateRemotePlayers();
 
-    updateTimer(delta);
+    updateTimer(
+        delta
+    );
 
-    automaticSave();
+    autoSave();
+
+    syncPlayer();
 
 
     renderer.render(
@@ -2780,29 +3484,22 @@ function animate(){
 }
 
 
-</script>
+animate();
 
-<script>
 
-/* =========================================================
-   WINDOW RESIZE
-   ========================================================= */
+/* =====================================================
+   RESIZE
+===================================================== */
 
 window.addEventListener(
     "resize",
     ()=>{
 
-        if(!camera || !renderer)
-            return;
-
-
         camera.aspect =
             innerWidth/
             innerHeight;
 
-
         camera.updateProjectionMatrix();
-
 
         renderer.setSize(
             innerWidth,
@@ -2813,21 +3510,87 @@ window.addEventListener(
 );
 
 
-/* =========================================================
-   GLOBAL ERROR HANDLER
-   ========================================================= */
+/* =====================================================
+   MAIN MENU
+===================================================== */
+
+document
+    .getElementById("menuButton")
+    .onclick =
+    ()=>{
+
+        location.reload();
+
+    };
+
+
+/* =====================================================
+   BEFORE LEAVING
+===================================================== */
 
 window.addEventListener(
-    "error",
-    e=>{
+    "beforeunload",
+    ()=>{
 
-        console.error(
-            "Game error:",
-            e.error
-        );
+        if(
+            state.started &&
+            !state.ended
+        ){
 
-    }
-);
+            const saveData = {
+
+                playerId:
+                    state.playerId,
+
+                playerName:
+                    state.playerName,
+
+                roomId:
+                    state.roomId,
+
+                x:
+                    player.x,
+
+                y:
+                    player.y,
+
+                z:
+                    player.z,
+
+                yaw:
+                    player.yaw,
+
+                pitch:
+                    player.pitch,
+
+                health:
+                    state.health,
+
+                time:
+                    state.time,
+
+                keys:
+                    state.keys,
+
+                score:
+                    state.score,
+
+                savedAt:
+                    Date.now()
+
+            };
+
+
+            localStorage.setItem(
+                "escapeSchoolSave",
+                JSON.stringify(
+                    saveData
+                )
+            );
+
+        }
+
+    });
 
 </script>
 
