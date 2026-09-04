@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Rift Rivals Online</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#05070d;color:#fff;font-family:Arial,Helvetica,sans-serif}
+canvas{display:block}
+button,input,select{font:inherit}
+button{border:0;cursor:pointer}
+.hidden{display:none!important}
+#menu{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:18px;background:radial-gradient(circle,#20345e 0%,#080c14 55%,#020304 100%)}
+.menuBox{width:min(760px,96vw);max-height:95vh;overflow:auto;padding:26px;border-radius:22px;background:rgba(9,12,18,.97);border:1px solid #354153}
+.logo{text-align:center;font-size:38px;font-weight:900}
+.subtitle{text-align:center;color:#a4afc1;margin:6px 0 18px}
+.section{margin-top:16px;margin-bottom:7px;color:#b3bece;font-size:13px;font-weight:bold}
+input,select{width:100%;padding:12px;margin-top:6px;border-radius:10px;border:1px solid #394557;background:#151a24;color:white;outline:none}
+button{width:100%;padding:12px;margin-top:8px;border-radius:10px;background:#2c6ff0;color:white;font-weight:bold}
+button:hover{filter:brightness(1.1)}
+.secondary{background:#2d333e}
+.green{background:#179951}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.card{padding:11px;border-radius:11px;background:#161c26;border:2px solid transparent;cursor:pointer}
+.card.selected{border-color:#5e95ff;background:#192b49}
+.card b{display:block;margin-bottom:4px}
+.card small{color:#a0abba;line-height:1.35}
+#firebaseStatus,#roomStatus{margin-top:9px;padding:9px;border-radius:9px;background:#171d28;text-align:center;font-size:13px}
+#firebaseStatus{color:#ffd65a}
+#roomStatus{color:#8be8a5;min-height:18px}
+#roomCard{margin-top:12px;padding:13px;border-radius:12px;background:#121822;border:1px solid #303948}
+#roomCode{text-align:center;font-size:30px;font-weight:900;letter-spacing:6px;margin:5px 0}
+#roomPlayers{line-height:1.55;color:#bbc6d5}
+#hud{position:fixed;left:12px;top:12px;z-index:50;pointer-events:none}
+.hudBox{min-width:220px;padding:9px 12px;margin-bottom:6px;border-radius:11px;background:rgba(0,0,0,.68);border:1px solid rgba(255,255,255,.14)}
+#healthBar{height:11px;margin-top:5px;border-radius:20px;overflow:hidden;background:#2b3037}
+#healthFill{width:100%;height:100%;background:#31d06c}
+#crosshair{position:fixed;left:50%;top:50%;width:10px;height:10px;transform:translate(-50%,-50%);border:2px solid white;border-radius:50%;z-index:20;pointer-events:none}
+#message{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);z-index:100;padding:11px 18px;border-radius:11px;background:rgba(0,0,0,.86);border:1px solid rgba(255,255,255,.17);opacity:0;transition:.2s;pointer-events:none}
+#gameLoadout{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:60;display:flex;gap:7px}
+.slot{width:115px;padding:8px;border-radius:9px;text-align:center;background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.18);font-size:10px}
+.slot.active{border-color:#5fa2ff;background:rgba(34,78,130,.78)}
+#stationPrompt{position:fixed;left:50%;top:65%;transform:translateX(-50%);z-index:80;padding:10px 16px;border-radius:10px;background:rgba(0,0,0,.78);display:none}
+#stationMenu,#gameOver{position:fixed;inset:0;z-index:500;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.84)}
+.panel{width:min(620px,94vw);max-height:88vh;overflow:auto;padding:24px;border-radius:18px;background:#111720;border:1px solid #394456}
+.stationWeapon{margin-top:7px;padding:9px;border-radius:9px;background:#171f2b;font-size:12px}
+#killFeed{position:fixed;right:12px;top:12px;z-index:55;width:260px;pointer-events:none}
+.feed{padding:7px 9px;margin-bottom:5px;border-radius:8px;background:rgba(0,0,0,.62);font-size:12px}
+#mobile{display:none;position:fixed;left:12px;bottom:12px;z-index:90}
+.mrow{display:flex;justify-content:center}
+.mbtn{width:57px;height:57px;margin:3px;border-radius:13px;background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;touch-action:none}
+#mobileAttack,#mobileInteract{display:none;position:fixed;right:22px;z-index:90;border-radius:50%}
+#mobileAttack{bottom:28px;width:75px;height:75px;background:#b43a3a}
+#mobileInteract{bottom:115px;width:64px;height:64px;background:#316cc2}
+@media(max-width:740px){
+  .grid{grid-template-columns:1fr}
+  .logo{font-size:28px}
+  #mobile,#mobileAttack,#mobileInteract{display:block}
+  #crosshair,#gameLoadout{display:none}
+  #killFeed{width:190px}
+}
+</style>
+</head>
+<body>
+
+<div id="menu">
+  <div class="menuBox">
+    <div class="logo">⚔️ RIFT RIVALS ONLINE</div>
+    <div class="subtitle">Real online players • 1–4 players • 9 arenas • 4 fictional weapons per match</div>
+
+    <div id="nameScreen">
+      <div class="section">PLAYER NAME</div>
+      <input id="playerName" maxlength="18" placeholder="Enter your name">
+      <button id="continueBtn">Continue</button>
+    </div>
+
+    <div id="lobbyScreen" class="hidden">
+      <div id="firebaseStatus">🟡 Loading Firebase...</div>
+
+      <div class="section">SELECT ARENA</div>
+      <div id="arenaGrid" class="grid"></div>
+
+      <div class="section">STARTING LOADOUT</div>
+      <div id="loadoutText" style="padding:10px;border-radius:10px;background:#141b25;color:#b9c5d8"></div>
+
+      <div class="section">MULTIPLAYER</div>
+      <button id="createBtn">🎮 Create Room</button>
+      <input id="joinInput" maxlength="6" placeholder="ROOM CODE" style="text-transform:uppercase">
+      <button id="joinBtn">🔗 Join Room</button>
+      <button id="backBtn" class="secondary">← Back</button>
+      <div id="roomStatus"></div>
+
+      <div id="roomCard" class="hidden">
+        <div style="text-align:center">ROOM CODE</div>
+        <div id="roomCode">------</div>
+        <div id="roomPlayers">Waiting...</div>
+        <button id="startBtn" class="green">🚀 Start Match</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="hud">
+  <div class="hudBox">❤️ Health<div id="healthBar"><div id="healthFill"></div></div><div style="font-size:11px;margin-top:3px"><span id="healthText">100</span> / 100</div></div>
+  <div class="hudBox">⚔️ <span id="weaponHud">Pulse Blade</span><br>Damage: <span id="damageText">15</span></div>
+  <div class="hudBox">💀 Kills: <span id="killsText">0</span> • Deaths: <span id="deathsText">0</span></div>
+  <div class="hudBox">🏟️ <span id="arenaText">Neon Yard</span></div>
+  <div class="hudBox">👥 <div id="playersHud">Waiting...</div></div>
+</div>
+
+<div id="killFeed"></div>
+<div id="gameLoadout"></div>
+<div id="crosshair"></div>
+<div id="message"></div>
+<div id="stationPrompt">🗑️ Press E to switch weapons</div>
+
+<div id="stationMenu" class="hidden">
+  <div class="panel">
+    <h2>🗑️ WEAPON DUSTBIN</h2>
+    <p style="margin:8px 0;color:#aeb8c7">Switch between your four match weapons.</p>
+    <div id="stationWeapons"></div>
+    <button id="closeStation" class="secondary">Close</button>
+  </div>
+</div>
+
+<div id="gameOver" class="hidden">
+  <div class="panel" style="text-align:center">
+    <h1>🏆 MATCH OVER</h1>
+    <p id="gameOverText" style="margin:12px 0;color:#bbc5d3;line-height:1.6"></p>
+    <button id="returnBtn">🏠 Return</button>
+  </div>
+</div>
+
+<div id="mobile">
+  <div class="mrow"><div class="mbtn" data-key="KeyW">▲</div></div>
+  <div class="mrow"><div class="mbtn" data-key="KeyA">◀</div><div class="mbtn" data-key="KeyS">▼</div><div class="mbtn" data-key="KeyD">▶</div></div>
+</div>
+<button id="mobileAttack">⚔️</button>
+<button id="mobileInteract">E</button>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getDatabase, ref, set, get, update, onValue, onDisconnect, push, runTransaction
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+/* =========================================================
+   FIREBASE
+   Replace YOUR_* with the exact values from Firebase:
+   Project Settings → General → Your Web App
+========================================================= */
+const firebaseConfig = {
+  apiKey: "AIzaSyB2D31wQh9jApQagWeYMkG6ieJuY4xn8OA",
+  authDomain: "game1-a3220.firebaseapp.com",
+  databaseURL: "https://game1-a3220-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "game1-a3220",
+  storageBucket: "game1-a3220.firebasestorage.app",
+  messagingSenderId: "508583368014",
+  appId: "1:508583368014:web:8555b4194e68d728f43a1f",
+  measurementId: "G-DVVE5XYMHE"
+};
+
+const state = {
+  playerId: localStorage.getItem("riftOnlineId") || crypto.randomUUID(),
+  playerName: localStorage.getItem("riftOnlineName") || "",
+  roomId: null,
+  host: false,
+  started: false,
+  ended: false,
+  stationOpen: false,
+  arena: 0,
+  health: 100,
+  kills: 0,
+  deaths: 0,
+  activeSlot: 0,
+  loadout: ["pulse_blade","nova_blaster","arc_orb","titan_cannon"]
+};
+localStorage.setItem("riftOnlineId", state.playerId);
+
+const arenas = [
+  {name:"Neon Yard",floor:0x263245,wall:0x385e83},
+  {name:"Crystal Cave",floor:0x29213f,wall:0x665197},
+  {name:"Desert Ruins",floor:0x503821,wall:0x92683b},
+  {name:"Cyber City",floor:0x182933,wall:0x176b88},
+  {name:"Forest Temple",floor:0x26392a,wall:0x47754d},
+  {name:"Frozen Core",floor:0x273f50,wall:0x71a1b8},
+  {name:"Volcano Ring",floor:0x48211e,wall:0x9b3827},
+  {name:"Void Fortress",floor:0x211c31,wall:0x553d7d},
+  {name:"Champion Arena",floor:0x383018,wall:0xa48827}
+];
+
+const weapons = {
+  pulse_blade:{name:"Pulse Blade",damage:22,range:5,color:0x46a4ff,cooldown:.35,type:"blade"},
+  nova_blaster:{name:"Nova Blaster",damage:18,range:18,color:0xff55d8,cooldown:.22,type:"blaster"},
+  arc_orb:{name:"Arc Orb",damage:25,range:12,color:0xc56cff,cooldown:.45,type:"orb"},
+  titan_cannon:{name:"Titan Cannon",damage:34,range:15,color:0xffbb34,cooldown:.8,type:"cannon"}
+};
+
+let db=null, firebaseReady=false, roomPlayers={}, roomData=null;
+let scene,camera,renderer,clock,weaponView=null;
+let colliders=[], dustbins=[], remoteMeshes={}, keysDown={};
+let attackCooldown=0, lastSend=0, messageTimer=null;
+
+const player={x:0,y:1.7,z:20,yaw:0,pitch:0,speed:7,sprint:10};
+
+const $=id=>document.getElementById(id);
+const menu=$("menu"), nameScreen=$("nameScreen"), lobbyScreen=$("lobbyScreen");
+const firebaseStatus=$("firebaseStatus"), roomStatus=$("roomStatus"), roomCard=$("roomCard");
+const roomCode=$("roomCode"), roomPlayersEl=$("roomPlayers"), playersHud=$("playersHud");
+const healthFill=$("healthFill"), healthText=$("healthText"), weaponHud=$("weaponHud"), damageText=$("damageText");
+const killsText=$("killsText"), deathsText=$("deathsText"), arenaText=$("arenaText");
+const messageEl=$("message"), stationMenu=$("stationMenu"), stationWeapons=$("stationWeapons");
+
+function setStatus(t){ firebaseStatus.textContent=t; }
+function setRoomStatus(t){ roomStatus.textContent=t; }
+
+try{
+  const app=initializeApp(firebaseConfig);
+  db=getDatabase(app);
+  onValue(ref(db,".info/connected"),snap=>{
+    firebaseReady=snap.val()===true;
+    setStatus(firebaseReady?"🟢 Realtime Database connected":"🟡 Connecting to Realtime Database...");
+  },err=>{
+    firebaseReady=false;
+    setStatus("🔴 Database error");
+    console.error(err);
+  });
+}catch(err){
+  setStatus("🔴 Firebase failed");
+  console.error(err);
+}
+
+$("playerName").value=state.playerName;
+$("continueBtn").onclick=()=>{
+  const name=$("playerName").value.trim();
+  if(!name){alert("Enter your name.");return;}
+  state.playerName=name;
+  localStorage.setItem("riftOnlineName",name);
+  nameScreen.classList.add("hidden");
+  lobbyScreen.classList.remove("hidden");
+};
+$("backBtn").onclick=()=>{lobbyScreen.classList.add("hidden");nameScreen.classList.remove("hidden");};
+
+function renderArenas(){
+  const grid=$("arenaGrid"); grid.innerHTML="";
+  arenas.forEach((a,i)=>{
+    const c=document.createElement("div");
+    c.className="card"+(i===state.arena?" selected":"");
+    c.innerHTML=`<b>${i+1}. ${a.name}</b><small>Online arena</small>`;
+    c.onclick=()=>{state.arena=i;renderArenas();};
+    grid.appendChild(c);
+  });
+}
+renderArenas();
+
+function renderLoadoutText(){
+  $("loadoutText").innerHTML=state.loadout.map((id,i)=>`${i+1}. ${weapons[id].name} — ${weapons[id].damage} DMG`).join("<br>");
+}
+renderLoadoutText();
+
+function generateRoomCode(){
+  const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let out="";
+  for(let i=0;i<6;i++) out+=chars[Math.floor(Math.random()*chars.length)];
+  return out;
+}
+
+function playerData(){
+  return {
+    id:state.playerId,name:state.playerName,x:0,y:1.7,z:20,yaw:0,
+    hp:100,kills:0,deaths:0,activeSlot:0,connected:true,updatedAt:Date.now()
+  };
+}
+
+$("createBtn").onclick=async()=>{
+  if(!firebaseReady){setRoomStatus("⏳ Database still connecting...");return;}
+  const b=$("createBtn");
+  try{
+    b.disabled=true;b.textContent="⏳ Creating...";
+    const code=generateRoomCode();
+    state.roomId=code;state.host=true;
+    await set(ref(db,`rooms/${code}`),{
+      host:state.playerId,arena:state.arena,started:false,createdAt:Date.now(),
+      players:{[state.playerId]:playerData()},events:{}
+    });
+    roomCode.textContent=code;roomCard.classList.remove("hidden");
+    setRoomStatus(`✅ Room ${code} created`);
+    listenRoom();setupDisconnect();
+  }catch(err){
+    console.error(err);setRoomStatus("❌ "+err.message);
+  }finally{
+    b.disabled=false;b.textContent="🎮 Create Room";
+  }
+};
+
+$("joinBtn").onclick=async()=>{
+  if(!firebaseReady){setRoomStatus("⏳ Database still connecting...");return;}
+  const code=$("joinInput").value.trim().toUpperCase();
+  if(code.length!==6){setRoomStatus("❌ Enter a 6-character code.");return;}
+  try{
+    const snap=await get(ref(db,`rooms/${code}`));
+    if(!snap.exists()){setRoomStatus("❌ Room not found.");return;}
+    const room=snap.val(), players=room.players||{};
+    if(room.started){setRoomStatus("❌ Match already started.");return;}
+    if(Object.keys(players).length>=4){setRoomStatus("❌ Room full.");return;}
+    state.roomId=code;state.host=false;state.arena=room.arena||0;
+    await set(ref(db,`rooms/${code}/players/${state.playerId}`),playerData());
+    roomCode.textContent=code;roomCard.classList.remove("hidden");
+    setRoomStatus("✅ Joined room");
+    listenRoom();setupDisconnect();
+  }catch(err){
+    console.error(err);setRoomStatus("❌ "+err.message);
+  }
+};
+
+function setupDisconnect(){
+  onDisconnect(ref(db,`rooms/${state.roomId}/players/${state.playerId}/connected`)).set(false);
+}
+
+function listenRoom(){
+  onValue(ref(db,`rooms/${state.roomId}`),snap=>{
+    if(!snap.exists())return;
+    roomData=snap.val();roomPlayers=roomData.players||{};
+    renderPlayers();
+    if(roomData.started&&!state.started){
+      state.arena=roomData.arena||0;
+      startGame();
+    }
+  });
+  onValue(ref(db,`rooms/${state.roomId}/events`),snap=>{
+    if(!snap.exists())return;
+    const events=Object.values(snap.val()).sort((a,b)=>(b.at||0)-(a.at||0)).slice(0,5);
+    $("killFeed").innerHTML=events.map(e=>`<div class="feed">${escapeHTML(e.text||"")}</div>`).join("");
+  });
+}
+
+function escapeHTML(t){
+  return String(t??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
+}
+
+function renderPlayers(){
+  const list=Object.values(roomPlayers);
+  roomPlayersEl.innerHTML=list.map(p=>`• ${escapeHTML(p.name)} ${p.connected===false?"🔴":"🟢"} — ${p.kills||0}K`).join("<br>");
+  playersHud.innerHTML=list.map(p=>`${escapeHTML(p.name)} — ${p.kills||0}K/${p.deaths||0}D`).join("<br>");
+}
+
+$("startBtn").onclick=async()=>{
+  if(!state.host){alert("Only host can start.");return;}
+  await update(ref(db,`rooms/${state.roomId}`),{started:true,startedAt:Date.now()});
+};
+
+/* ========================= THREE ========================= */
+
+function initThree(){
+  scene=new THREE.Scene();
+  camera=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,.1,160);
+  renderer=new THREE.WebGLRenderer({antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setSize(innerWidth,innerHeight);
+  renderer.shadowMap.enabled=true;
+  renderer.domElement.tabIndex=0;
+  document.body.appendChild(renderer.domElement);
+  clock=new THREE.Clock();
+  setupMouse();
+}
+initThree();
+
+function mat(color){return new THREE.MeshStandardMaterial({color,roughness:.65,metalness:.18});}
+
+function makeBox(x,y,z,sx,sy,sz,color,collision=true){
+  const mesh=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),mat(color));
+  mesh.position.set(x,y,z);mesh.castShadow=true;mesh.receiveShadow=true;scene.add(mesh);
+  if(collision)colliders.push({x,z,width:sx,depth:sz});
+  return mesh;
+}
+
+function buildArena(){
+  while(scene.children.length)scene.remove(scene.children[0]);
+  colliders=[];dustbins=[];remoteMeshes={};
+  const a=arenas[state.arena];
+  scene.background=new THREE.Color(a.floor);
+  scene.fog=new THREE.Fog(a.floor,22,90);
+  scene.add(new THREE.HemisphereLight(0xaac7f1,0x151515,1.3));
+  const d=new THREE.DirectionalLight(0xffffff,1.4);d.position.set(15,30,10);scene.add(d);
+  makeBox(0,-.5,0,58,1,58,a.floor,false);
+  makeBox(-29,3,0,1,6,58,a.wall);
+  makeBox(29,3,0,1,6,58,a.wall);
+  makeBox(0,3,-29,58,6,1,a.wall);
+  makeBox(0,3,29,58,6,1,a.wall);
+
+  const layout=state.arena%3;
+  if(layout===0){
+    for(let z=-18;z<=18;z+=12){makeBox(-9,1,z,4,2,4,a.wall);makeBox(9,1,z+5,4,2,4,a.wall);}
+  }else if(layout===1){
+    makeBox(0,2,0,8,4,8,a.wall);
+    [[-16,-16],[16,-16],[-16,16],[16,16]].forEach(([x,z])=>makeBox(x,1,z,5,2,5,a.wall));
+  }else{
+    for(let x=-18;x<=18;x+=9)makeBox(x,1,0,3,2,14,a.wall);
+  }
+
+  createDustbin(-23,23);createDustbin(23,-23);createDustbin(-23,-23);
+  player.x=0;player.z=20;camera.position.set(player.x,player.y,player.z);
+  createFirstPersonWeapon();
+}
+
+function createDustbin(x,z){
+  const body=new THREE.Mesh(new THREE.CylinderGeometry(.75,.65,1.8,12),mat(0x2f7351));
+  body.position.set(x,.9,z);scene.add(body);
+  const lid=new THREE.Mesh(new THREE.CylinderGeometry(.82,.82,.18,12),mat(0x1e4d37));
+  lid.position.set(x,1.85,z);scene.add(lid);
+  dustbins.push({x,z});
+}
+
+function activeWeaponId(){return state.loadout[state.activeSlot]||state.loadout[0];}
+function activeWeapon(){return weapons[activeWeaponId()];}
+
+function createFirstPersonWeapon(){
+  if(weaponView)camera.remove(weaponView);
+  const w=activeWeapon();if(!w)return;
+  weaponView=new THREE.Group();
+  const handle=new THREE.Mesh(new THREE.BoxGeometry(.18,.42,.18),mat(0x222831));
+  handle.position.set(.28,-.27,-.65);weaponView.add(handle);
+  const body=new THREE.Mesh(new THREE.BoxGeometry(.22,.23,.72),new THREE.MeshStandardMaterial({color:w.color,emissive:w.color,emissiveIntensity:.16,metalness:.6,roughness:.28}));
+  body.position.set(.28,-.12,-.8);weaponView.add(body);
+  if(w.type==="orb"){
+    const orb=new THREE.Mesh(new THREE.SphereGeometry(.2,16,16),new THREE.MeshStandardMaterial({color:w.color,emissive:w.color,emissiveIntensity:.8}));
+    orb.position.set(.28,-.1,-1.1);weaponView.add(orb);
+  }
+  camera.add(weaponView);scene.add(camera);
+  updateHUD();renderGameLoadout();
+}
+
+function switchWeapon(slot){
+  if(slot<0||slot>=state.loadout.length)return;
+  state.activeSlot=slot;createFirstPersonWeapon();showMessage(`⚔️ ${activeWeapon().name}`);
+}
+
+function renderGameLoadout(){
+  const el=$("gameLoadout");el.innerHTML="";
+  for(let i=0;i<4;i++){
+    const id=state.loadout[i],w=id?weapons[id]:null;
+    const d=document.createElement("div");
+    d.className="slot"+(state.activeSlot===i?" active":"");
+    d.innerHTML=`${i+1}<br>${w?w.name:"Empty"}`;el.appendChild(d);
+  }
+}
+
+function collides(x,z){
+  const r=.45;
+  return colliders.some(c=>x+r>c.x-c.width/2&&x-r<c.x+c.width/2&&z+r>c.z-c.depth/2&&z-r<c.z+c.depth/2);
+}
+
+document.addEventListener("keydown",e=>{
+  keysDown[e.code]=true;
+  if(e.code==="Digit1")switchWeapon(0);
+  if(e.code==="Digit2")switchWeapon(1);
+  if(e.code==="Digit3")switchWeapon(2);
+  if(e.code==="Digit4")switchWeapon(3);
+  if(e.code==="KeyF")attack();
+  if(e.code==="KeyE")interactDustbin();
+});
+document.addEventListener("keyup",e=>keysDown[e.code]=false);
+window.addEventListener("blur",()=>keysDown={});
+
+function setupMouse(){
+  renderer.domElement.addEventListener("click",()=>{
+    if(!state.started||state.stationOpen)return;
+    renderer.domElement.requestPointerLock();
+    attack();
+  });
+  document.addEventListener("mousemove",e=>{
+    if(document.pointerLockElement!==renderer.domElement)return;
+    player.yaw-=e.movementX*.0022;
+    player.pitch-=e.movementY*.0022;
+    player.pitch=Math.max(-1.4,Math.min(1.4,player.pitch));
+  });
+}
+
+function updateMovement(dt){
+  if(!state.started||state.ended||state.stationOpen)return;
+  let f=0,s=0;
+  if(keysDown.KeyW)f++;
+  if(keysDown.KeyS)f--;
+  if(keysDown.KeyD)s++;
+  if(keysDown.KeyA)s--;
+  const len=Math.hypot(f,s);if(!len)return;
+  f/=len;s/=len;
+  const speed=(keysDown.ShiftLeft||keysDown.ShiftRight)?player.sprint:player.speed;
+  const fx=Math.sin(player.yaw),fz=Math.cos(player.yaw),rx=Math.cos(player.yaw),rz=-Math.sin(player.yaw);
+  const dx=(fx*f+rx*s)*speed*dt,dz=(fz*f+rz*s)*speed*dt;
+  const nx=player.x+dx;if(!collides(nx,player.z))player.x=nx;
+  const nz=player.z+dz;if(!collides(player.x,nz))player.z=nz;
+  camera.position.set(player.x,player.y,player.z);
+}
+
+function updateCamera(){
+  camera.rotation.order="YXZ";
+  camera.rotation.y=-player.yaw;
+  camera.rotation.x=player.pitch;
+}
+
+async function attack(){
+  if(!state.started||state.ended||state.stationOpen||attackCooldown>0)return;
+  const w=activeWeapon();if(!w)return;
+  attackCooldown=w.cooldown;
+
+  let best=null,bestDist=Infinity;
+  Object.values(roomPlayers).forEach(p=>{
+    if(p.id===state.playerId||p.connected===false||p.hp<=0)return;
+    const dx=(p.x||0)-player.x,dz=(p.z||0)-player.z,dist=Math.hypot(dx,dz);
+    if(dist<w.range&&dist<bestDist){best=p;bestDist=dist;}
+  });
+  if(!best){showMessage("Miss");return;}
+
+  try{
+    const hpRef=ref(db,`rooms/${state.roomId}/players/${best.id}/hp`);
+    const tx=await runTransaction(hpRef,current=>{
+      const hp=typeof current==="number"?current:100;
+      return Math.max(0,hp-w.damage);
+    });
+    const newHp=tx.snapshot.val();
+
+    if(newHp<=0){
+      await registerKill(best.id,best.name||"Player");
+    }
+  }catch(err){console.error(err);}
+}
+
+async function registerKill(victimId,victimName){
+  const victimRef=ref(db,`rooms/${state.roomId}/players/${victimId}`);
+  const victimSnap=await get(victimRef);
+  if(!victimSnap.exists())return;
+  const victim=victimSnap.val();
+  if(victim.lastDeathProcessed&&Date.now()-victim.lastDeathProcessed<1500)return;
+
+  await update(victimRef,{deaths:(victim.deaths||0)+1,lastDeathProcessed:Date.now()});
+  const myRef=ref(db,`rooms/${state.roomId}/players/${state.playerId}`);
+  const mySnap=await get(myRef);
+  const me=mySnap.exists()?mySnap.val():{};
+  await update(myRef,{kills:(me.kills||0)+1});
+  await push(ref(db,`rooms/${state.roomId}/events`),{
+    text:`${state.playerName} eliminated ${victimName}`,at:Date.now()
+  });
+  setTimeout(()=>respawnPlayer(victimId),1200);
+  await checkWin();
+}
+
+async function respawnPlayer(id){
+  const spawns=[[0,20],[20,0],[-20,0],[0,-20]];
+  const index=Object.keys(roomPlayers).indexOf(id);
+  const s=spawns[Math.max(0,index)%spawns.length];
+  await update(ref(db,`rooms/${state.roomId}/players/${id}`),{hp:100,x:s[0],y:1.7,z:s[1],updatedAt:Date.now()});
+}
+
+async function checkWin(){
+  const snap=await get(ref(db,`rooms/${state.roomId}/players`));
+  if(!snap.exists())return;
+  const list=Object.values(snap.val());
+  const winner=list.find(p=>(p.kills||0)>=7);
+  if(winner){
+    await update(ref(db,`rooms/${state.roomId}`),{ended:true,winner:winner.name||"Player"});
+  }
+}
+
+function updateRemotePlayers(){
+  Object.values(roomPlayers).forEach(p=>{
+    if(p.id===state.playerId)return;
+    let mesh=remoteMeshes[p.id];
+    if(!mesh){
+      mesh=new THREE.Mesh(new THREE.CapsuleGeometry(.45,1.1,5,10),new THREE.MeshStandardMaterial({color:Math.random()*0xffffff}));
+      scene.add(mesh);remoteMeshes[p.id]=mesh;
+    }
+    mesh.visible=p.connected!==false&&p.hp>0;
+    if(mesh.visible)mesh.position.lerp(new THREE.Vector3(p.x||0,p.y||1.7,p.z||0),.3);
+  });
+}
+
+function nearestDustbin(){
+  let best=null,dist=Infinity;
+  dustbins.forEach(d=>{const x=Math.hypot(player.x-d.x,player.z-d.z);if(x<dist){dist=x;best=d;}});
+  return {best,dist};
+}
+function updateDustbinPrompt(){
+  $("stationPrompt").style.display=nearestDustbin().dist<2.8?"block":"none";
+}
+function interactDustbin(){
+  if(nearestDustbin().dist>=2.8){showMessage("No dustbin nearby.");return;}
+  state.stationOpen=true;
+  if(document.pointerLockElement)document.exitPointerLock();
+  renderStation();
+  stationMenu.classList.remove("hidden");
+}
+function renderStation(){
+  stationWeapons.innerHTML=state.loadout.map((id,i)=>`
+    <div class="stationWeapon">
+      <b>${i+1}. ${weapons[id].name}</b><br>
+      Damage ${weapons[id].damage}
+      <button onclick="window.chooseSlot(${i})">Use this weapon</button>
+    </div>`).join("");
+}
+window.chooseSlot=i=>{switchWeapon(i);state.stationOpen=false;stationMenu.classList.add("hidden");};
+$("closeStation").onclick=()=>{state.stationOpen=false;stationMenu.classList.add("hidden");};
+
+async function syncPlayer(){
+  if(!firebaseReady||!state.roomId||!state.started)return;
+  const now=Date.now();if(now-lastSend<120)return;lastSend=now;
+  try{
+    await update(ref(db,`rooms/${state.roomId}/players/${state.playerId}`),{
+      x:player.x,y:player.y,z:player.z,yaw:player.yaw,hp:state.health,
+      activeSlot:state.activeSlot,connected:true,updatedAt:now
+    });
+  }catch(err){console.error(err);}
+}
+
+function updateLocalFromRoom(){
+  const me=roomPlayers[state.playerId];
+  if(!me)return;
+  state.health=Math.max(0,Math.min(100,me.hp??100));
+  state.kills=me.kills||0;state.deaths=me.deaths||0;
+  if(state.health<=0){
+    showMessage("💥 Eliminated — respawning...");
+  }else if(Math.hypot(player.x-(me.x||0),player.z-(me.z||0))>4){
+    player.x=me.x||0;player.z=me.z||0;
+  }
+  if(roomData?.ended&&!state.ended){
+    state.ended=true;
+    $("gameOverText").innerHTML=`Winner: <b>${escapeHTML(roomData.winner||"Player")}</b><br><br>Your score: ${state.kills} kills / ${state.deaths} deaths`;
+    $("gameOver").classList.remove("hidden");
+  }
+}
+
+function updateHUD(){
+  healthFill.style.width=`${state.health}%`;
+  healthText.textContent=Math.round(state.health);
+  killsText.textContent=state.kills;
+  deathsText.textContent=state.deaths;
+  const w=activeWeapon();
+  if(w){weaponHud.textContent=w.name;damageText.textContent=w.damage;}
+  arenaText.textContent=arenas[state.arena].name;
+}
+
+function showMessage(t){
+  messageEl.textContent=t;messageEl.style.opacity="1";
+  clearTimeout(messageTimer);
+  messageTimer=setTimeout(()=>messageEl.style.opacity="0",1800);
+}
+
+function startGame(){
+  if(state.started)return;
+  state.started=true;state.ended=false;state.health=100;state.kills=0;state.deaths=0;
+  menu.classList.add("hidden");
+  buildArena();renderGameLoadout();updateHUD();
+  showMessage("🌐 Online match started");
+}
+
+document.querySelectorAll(".mbtn").forEach(b=>{
+  const key=b.dataset.key;
+  b.addEventListener("touchstart",e=>{e.preventDefault();keysDown[key]=true},{passive:false});
+  b.addEventListener("touchend",e=>{e.preventDefault();keysDown[key]=false},{passive:false});
+});
+$("mobileAttack").onclick=attack;
+$("mobileInteract").onclick=interactDustbin;
+$("returnBtn").onclick=()=>location.reload();
+
+function animate(){
+  requestAnimationFrame(animate);
+  const dt=Math.min(clock.getDelta(),.05);
+  if(state.started&&!state.ended){
+    if(attackCooldown>0)attackCooldown-=dt;
+    updateMovement(dt);
+    updateCamera();
+    updateRemotePlayers();
+    updateDustbinPrompt();
+    updateLocalFromRoom();
+    updateHUD();
+    syncPlayer();
+  }
+  renderer.render(scene,camera);
+}
+animate();
+
+window.addEventListener("resize",()=>{
+  camera.aspect=innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+});
+</script>
+</body>
+</html>
